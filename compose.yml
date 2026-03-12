@@ -1,0 +1,20 @@
+services:
+  challenge-api:
+    image: redteamsubnet61/rest-hfp-challenge:0.0.0
+    build:
+      context: ./src/hfp_challenge/challenge
+    restart: unless-stopped
+    environment:
+      TERM: ${TERM:-xterm}
+      TZ: ${TZ:-UTC}
+      HFP_CHALLENGE_API_PORT: ${HFP_CHALLENGE_API_PORT:-10001}
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - "./volumes/configs/rest-hfp-challenge:${HFP_CHALLENGE_API_CONFIGS_DIR:-/etc/rest-hfp-challenge}"
+      - "./volumes/storage/rest-hfp-challenge/logs:${HFP_CHALLENGE_API_LOGS_DIR:-/var/log/rest-hfp-challenge}"
+      - "./volumes/storage/rest-hfp-challenge/data:${HFP_CHALLENGE_API_DATA_DIR:-/var/lib/rest-hfp-challenge}"
+    ports:
+      - "${HFP_CHALLENGE_API_PORT:-10001}:${HFP_CHALLENGE_API_PORT:-10001}"
+    tty: true
