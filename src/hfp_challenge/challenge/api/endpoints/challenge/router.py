@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 
+from api.core.constants import ErrorCodeEnum
+from api.core.exceptions import BaseHTTPException
 from api.logger import logger
 
 from .schemas import MinerInput, MinerOutput
@@ -29,8 +31,11 @@ def get_task(request: Request):
     except HTTPException:
         raise
     except Exception:
-        logger.error(f"[{_request_id}] - Failed to get task!")
-        raise
+        logger.exception(f"[{_request_id}] - Failed to get task!")
+        raise BaseHTTPException(
+            error_enum=ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+            message="Failed to get task!",
+        )
 
     return _miner_input
 
@@ -56,8 +61,11 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
     except HTTPException:
         raise
     except Exception:
-        logger.error(f"[{_request_id}] - Failed to score the miner output!")
-        raise
+        logger.exception(f"[{_request_id}] - Failed to score the miner output!")
+        raise BaseHTTPException(
+            error_enum=ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+            message="Failed to score the miner output!",
+        )
 
     return _score
 
