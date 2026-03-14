@@ -43,6 +43,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 request_id=request_id,
                 files_dir=tmp_dir,
             )
+            _utils.start_log_streaming_thread(container)
 
             config.challenge.fingerprinter_ip = ip_address
             logger.info(

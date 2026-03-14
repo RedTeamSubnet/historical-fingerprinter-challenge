@@ -110,3 +110,18 @@ def cleanup_container(container: docker.models.containers.Container) -> None:
         container.remove()
     except docker.errors.NotFound:
         pass
+
+
+def stream_container_logs(
+    container: docker.models.containers.Container, prefix: str = "[FINGERPRINTER]"
+) -> None:
+    for log_line in container.logs(stream=True, follow=True):
+        logger.debug(f"{prefix} {log_line.decode('utf-8').strip()}")
+
+
+def start_log_streaming_thread(
+    container: docker.models.containers.Container, prefix: str = "[FINGERPRINTER]"
+) -> Thread:
+    thread = Thread(target=stream_container_logs, args=(container, prefix), daemon=True)
+    thread.start()
+    return thread
