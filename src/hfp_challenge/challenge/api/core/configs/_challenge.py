@@ -25,6 +25,7 @@ class ChallengeConfig(FrozenBaseConfig):
     fingerprinter_ip: str = Field(
         "0.0.0.0", strip_whitespace=True, min_length=7, max_length=15
     )
+    fingerprinter_port: int = Field(default=8000, ge=1, le=65535)
     metrics_csv_path: str = Field(
         ..., strip_whitespace=True, min_length=2, max_length=256
     )

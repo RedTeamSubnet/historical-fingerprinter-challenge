@@ -49,10 +49,12 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 f"[{request_id}] - Fingerprinter container started at {ip_address}"
             )
 
-            _utils.wait_for_health(ip_address)
+            _utils.wait_for_health(
+                ip_address, fingerprinter_port=config.challenge.fingerprinter_port
+            )
             logger.info(f"[{request_id}] - Fingerprinter container is healthy")
 
-            base_url = f"http://{ip_address}:{_utils.FINGERPRINTER_PORT}"
+            base_url = f"http://{ip_address}:{config.challenge.fingerprinter_port}"
             df = pd.read_csv(config.challenge.metrics_csv_path)
             for index, row in df[["social_id", "user_metrics"]].iterrows():
                 logger.info(f"{index} is started")

@@ -1,3 +1,4 @@
+import os
 import time
 from enum import Enum
 
@@ -6,7 +7,6 @@ import requests
 
 NETWORK_NAME = "internal_net"
 FINGERPRINTER_IMAGE = "redteamsubnet61/hfp_fingerprinter:latest"
-FINGERPRINTER_PORT = 10002
 FINGERPRINT_STORAGE: dict[str, str] = {}
 
 
@@ -45,8 +45,10 @@ def ensure_network_exists() -> None:
         client.networks.create(NETWORK_NAME, driver="bridge", internal=True)
 
 
-def wait_for_health(ip_address: str, timeout: int = 60) -> None:
-    url = f"http://{ip_address}:{FINGERPRINTER_PORT}/health"
+def wait_for_health(
+    ip_address: str, timeout: int = 60, fingerprinter_port: int = 8000
+) -> None:
+    url = f"http://{ip_address}:{fingerprinter_port}/health"
     start = time.time()
     while time.time() - start < timeout:
         try:
