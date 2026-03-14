@@ -7,8 +7,37 @@ from api.logger import logger
 from api.core.dependencies.auth import auth_api_key
 from .schemas import MinerInput, MinerOutput
 from . import service
+from ._utils import get_scoring_status, get_fingerprint_storage
 
 router = APIRouter(tags=["Challenge"])
+
+
+@router.get(
+    "/status",
+    summary="Get status",
+    description="This endpoint returns the current scoring status.",
+    response_class=JSONResponse,
+)
+def get_status(request: Request):
+    _request_id = request.state.request_id
+    logger.info(f"[{_request_id}] - Getting status...")
+
+    status = get_scoring_status()
+    return {"status": status}
+
+
+@router.get(
+    "/results",
+    summary="Get results",
+    description="This endpoint returns the fingerprint storage.",
+    response_class=JSONResponse,
+)
+def get_results(request: Request):
+    _request_id = request.state.request_id
+    logger.info(f"[{_request_id}] - Getting results...")
+
+    results = get_fingerprint_storage()
+    return results
 
 
 @router.get(
@@ -53,11 +82,10 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
     _request_id = request.state.request_id
     logger.info(f"[{_request_id}] - Scoring the miner output...")
 
-    _score: float = 0.0
     try:
-        _score = service.score(request_id=_request_id, miner_output=miner_output)
+        service.score(request_id=_request_id, miner_output=miner_output)
         logger.success(
-            f"[{_request_id}] - Successfully scored the miner output: {_score}"
+            f"[{_request_id}] - Successfully scored the miner output"
         )
     except HTTPException:
         raise
@@ -68,7 +96,7 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
             message="Failed to score the miner output!",
         )
 
-    return _score
+    return None
 
 
 __all__ = ["router"]
