@@ -63,6 +63,15 @@ git clone git@github.com:RedTeamSubnet/historical-fingerprinter-challenge.git &&
 2. Extract it into the projects directory.
 3. Enter into the project directory.
 
+#### [OPTIONAL] Install dependencies (for **DEVELOPMENT** environment)
+
+```sh
+# For DEVELOPMENT environment, install dependencies with pip:
+pip install -e .[dev]
+# Install pre-commit hooks:
+pre-commit install
+```
+
 ### 3. 🌎 Configure environment variables
 
 [NOTE] Please, check **[environment variables](#-environment-variables)** section for more details.
