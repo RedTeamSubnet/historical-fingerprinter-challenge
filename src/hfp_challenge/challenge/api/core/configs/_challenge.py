@@ -9,7 +9,7 @@ from pydantic import (
 from pydantic_settings import SettingsConfigDict
 
 from api.core.constants import ENV_PREFIX
-from ._base import FrozenBaseConfig
+from ._base import FrozenBaseConfig, BaseConfig
 
 
 class ChallengeStatusEnum(str, Enum):
@@ -18,7 +18,7 @@ class ChallengeStatusEnum(str, Enum):
     COMPLETED = "completed"
 
 
-class ChallengeConfig(FrozenBaseConfig):
+class ChallengeConfig(BaseConfig):
     api_key: SecretStr = Field(..., min_length=8, max_length=128)
     single_request_timeout: int = Field(default=2, ge=1)
     acceptable_miss_count: int = Field(default=10, ge=0)
