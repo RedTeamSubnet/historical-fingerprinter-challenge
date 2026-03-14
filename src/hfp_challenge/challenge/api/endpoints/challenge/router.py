@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 from api.core.constants import ErrorCodeEnum
 from api.core.exceptions import BaseHTTPException
 from api.logger import logger
-
+from api.core.dependencies.auth import auth_api_key
 from .schemas import MinerInput, MinerOutput
 from . import service
 
@@ -46,6 +46,7 @@ def get_task(request: Request):
     description="This endpoint score miner output.",
     response_class=JSONResponse,
     responses={422: {}},
+    dependencies=[Depends(auth_api_key)],
 )
 def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOutput):
 
