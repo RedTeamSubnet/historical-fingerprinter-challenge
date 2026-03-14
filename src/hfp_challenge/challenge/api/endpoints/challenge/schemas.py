@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field, field_validator
 
 from potato_util.generator import gen_random_string
 
+from api.config import config
+
 
 class MinerInput(BaseModel):
     random_val: str | None = Field(
@@ -40,11 +42,30 @@ class MinerOutput(BaseModel):
     @field_validator("commit_files", mode="after")
     @classmethod
     def _check_commit_files(cls, val: list[CommitFilePM]) -> list[CommitFilePM]:
+        """
+        Validate the commit files based on the challenge configuration.
+            - The number of submitted files should match the expected count.
+            - Each file should not exceed the line limit.
+            - Each file should have a valid name and extension.
+        """
+        if len(val) != len(config.challenge.submission_fns):
+            raise ValueError(
+                f"Number of submitted files should be exactly {len(config.challenge.submission_fns)}!"
+            )
         for _miner_file_pm in val:
             _content_lines = _miner_file_pm.content.splitlines()
-            if len(_content_lines) > 500:
+            if len(_content_lines) > config.challenge.submission_length_limit:
                 raise ValueError(
-                    f"`{_miner_file_pm.file_name}` file contains too many lines, should be <= 500 lines!"
+                    f"`{_miner_file_pm.file_name}` file contains too many lines, should be <= {config.challenge.submission_length_limit} lines!"
+                )
+            _miner_file_name = _miner_file_pm.file_name.strip().split(".")
+            if _miner_file_name[-1] != "py":
+                raise ValueError(
+                    f"`{_miner_file_pm.file_name}` file has invalid extension, should be `.py`!"
+                )
+            elif _miner_file_name[0] not in config.challenge.submission_fns:
+                raise ValueError(
+                    f"`{_miner_file_pm.file_name}` file has invalid name, should be one of {config.challenge.submission_fns}!"
                 )
 
         return val
