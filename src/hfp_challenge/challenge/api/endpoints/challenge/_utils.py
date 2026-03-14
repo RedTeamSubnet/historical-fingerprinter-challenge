@@ -1,13 +1,16 @@
 import os
 import time
 from enum import Enum
+from threading import Thread
 
 import docker
 import requests
 
+from api.logger import logger
+
 NETWORK_NAME = "internal_net"
 FINGERPRINTER_IMAGE = "redteamsubnet61/hfp_fingerprinter:latest"
-FINGERPRINTER_BUILD_PATH = "/app/rest-hfp-challenge/fingerprinter"
+FINGERPRINTER_BUILD_PATH = f"{os.getenv('HFP_CHALLENGE_API_DIR')}/fingerprinter"
 FINGERPRINT_STORAGE: dict[str, str] = {}
 
 
@@ -47,7 +50,7 @@ def ensure_network_exists() -> None:
 
 
 def wait_for_health(
-    ip_address: str, timeout: int = 60, fingerprinter_port: int = 8000
+    ip_address: str, timeout: int = 100, fingerprinter_port: int = 8000
 ) -> None:
     url = f"http://{ip_address}:{fingerprinter_port}/health"
     start = time.time()
@@ -60,7 +63,7 @@ def wait_for_health(
             pass
         time.sleep(1)
     raise TimeoutError(
-        f"Fingerprinter container health check timed out after {timeout}s"
+        f"Fingerprinter container health check timed out after {timeout}s in this url: {url}"
     )
 
 
@@ -79,8 +82,7 @@ def _ensure_image(client: docker.DockerClient) -> None:
 
 
 def run_fingerprinter_container(
-    request_id: str,
-    files_dir: str,
+    request_id: str, files_dir: str, fingerprinter_port: int = 8000
 ) -> tuple[docker.models.containers.Container, str]:
     client = docker.from_env()
     ensure_network_exists()
@@ -88,11 +90,17 @@ def run_fingerprinter_container(
 
     container_name = f"fingerprinter_{request_id}"
 
+    volumes = {}
+    for file_name in os.listdir(files_dir):
+        file_path = os.path.join(files_dir, file_name)
+        target_path = f"/app/submissions/{file_name}"
+        volumes[file_path] = {"bind": target_path, "mode": "ro"}
     container = client.containers.run(
         FINGERPRINTER_IMAGE,
         detach=True,
         network=NETWORK_NAME,
-        volumes={files_dir: {"bind": "/app/submissions/"}},
+        environment={"PORT": str(fingerprinter_port)},
+        volumes=volumes,
         name=container_name,
     )
 

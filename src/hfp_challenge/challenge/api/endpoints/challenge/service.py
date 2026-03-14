@@ -34,7 +34,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         for file in miner_output.commit_files:
-            file_path = os.path.join(tmp_dir, f"{file.file_name}.py")
+            file_path = os.path.join(tmp_dir, file.file_name)
             with open(file_path, "w") as f:
                 f.write(file.content)
 
@@ -42,6 +42,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
             container, ip_address = _utils.run_fingerprinter_container(
                 request_id=request_id,
                 files_dir=tmp_dir,
+                fingerprinter_port=config.challenge.fingerprinter_port,
             )
             _utils.start_log_streaming_thread(container)
 
@@ -83,7 +84,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                     logger.error(
                         f"[{request_id}] - Error during fingerprint request for {social_id}: {str(e)}"
                     )
-                if _request_miss_counter > config.challenge.max_request_misses:
+                if _request_miss_counter > config.challenge.acceptable_miss_count:
                     logger.error(
                         f"[{request_id}] - Exceeded max request misses. Stopping fingerprinting."
                     )
@@ -96,7 +97,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
 
         finally:
             if container:
-                _utils.cleanup_container(container)
+                # _utils.cleanup_container(container)
                 logger.info(f"[{request_id}] - Fingerprinter container cleaned up")
             _utils.set_scoring_status(_utils.ScoringStatus.AVAILABLE)
 
