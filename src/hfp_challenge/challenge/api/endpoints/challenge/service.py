@@ -54,7 +54,8 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
 
             base_url = f"http://{ip_address}:{_utils.FINGERPRINTER_PORT}"
             df = pd.read_csv(config.challenge.metrics_csv_path)
-            for _, row in df[["social_id", "user_metrics"]].iterrows():
+            for index, row in df[["social_id", "user_metrics"]].iterrows():
+                logger.info(f"{index} is started")
                 social_id = str(row["social_id"])
                 user_metrics = json.loads(str(row["user_metrics"]))
                 try:
@@ -84,6 +85,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                         f"[{request_id}] - Exceeded max request misses. Stopping fingerprinting."
                     )
                     break
+                logger.info(f"{index} is finished")
 
             logger.info(
                 f"[{request_id}] - Fingerprinting completed. Stored {len(FINGERPRINT_STORAGE)} fingerprints"

@@ -74,7 +74,7 @@ def run_fingerprinter_container(
         FINGERPRINTER_IMAGE,
         detach=True,
         network=NETWORK_NAME,
-        volumes={files_dir: {"bind": "/app/submissions/", "mode": "ro"}},
+        volumes={files_dir: {"bind": "/app/submissions/"}},
         name=container_name,
     )
 
