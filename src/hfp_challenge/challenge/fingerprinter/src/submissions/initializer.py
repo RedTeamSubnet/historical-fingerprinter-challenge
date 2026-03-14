@@ -11,18 +11,20 @@ def initialize_db(db_path: str | None = None) -> sqlite3.Connection:
     if db_path is None:
         db_path = str(DB_PATH)
 
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
 
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS fingerprints (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fingerprint TEXT UNIQUE NOT NULL,
             visitor_id TEXT,
             user_agent TEXT,
             ip_address TEXT,
+            architecture TEXT,
             canvas_geometry TEXT,
             canvas_text TEXT,
             canvas_winding INTEGER,
@@ -65,7 +67,8 @@ def initialize_db(db_path: str | None = None) -> sqlite3.Connection:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
+    """
+    )
 
     conn.commit()
     logger.info(f"Database initialized at {db_path}")
