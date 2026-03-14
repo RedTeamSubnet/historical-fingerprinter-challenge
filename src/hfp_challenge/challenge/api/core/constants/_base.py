@@ -1,4 +1,4 @@
-ENV_PREFIX = "HFP_CHALLENGE_"
+ENV_PREFIX = "HFP_"
 ENV_PREFIX_API = f"{ENV_PREFIX}API_"
 
 API_SLUG = "rest-hfp-challenge"

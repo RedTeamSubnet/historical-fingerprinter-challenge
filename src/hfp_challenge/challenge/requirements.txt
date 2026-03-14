@@ -5,3 +5,4 @@ beans-logging-fastapi~=6.0.4
 fastapi[all]~=0.135.1
 pandas~=2.2.0
 requests~=2.31.0
+docker~=7.1.0

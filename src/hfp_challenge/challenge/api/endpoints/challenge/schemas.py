@@ -1,8 +1,34 @@
+import os
+from pathlib import Path
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
 from potato_util.generator import gen_random_string
 
 from api.config import config
+from api.logger import logger
+
+api_dir = os.environ.get("HFP_CHALLENGE_API_DIR", "/app/rest-hfp-challenge")
+_submission_path = Path(os.path.join(api_dir, "fingerprinter", "src", "submissions"))
+_frameworks_names = config.challenge.submission_fns
+_detection_files: dict[list[dict[str, Any]]] = {"commit_files": []}
+
+try:
+    if _submission_path.exists():
+        for _detection_path in _submission_path.glob("*.py"):
+            _file_stem = _detection_path.stem
+            if _file_stem in _frameworks_names:
+                with open(_detection_path, "r") as _detection_file:
+                    _detection_files["commit_files"].append(
+                        {
+                            "file_name": _detection_path.name,
+                            "content": _detection_file.read(),
+                        }
+                    )
+
+except Exception:
+    logger.exception(f"Failed to read detection files in detections folder!")
 
 
 class MinerInput(BaseModel):
@@ -38,6 +64,23 @@ class MinerOutput(BaseModel):
         title="Commit Files",
         description="List of Commit files for the challenge.",
     )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": (
+                [_detection_files]
+                if _detection_files
+                else [
+                    {"file_name": "initializer.py", "content": "# initializer code"},
+                    {
+                        "file_name": "metrics_collector.py",
+                        "content": "# metrics_collector code",
+                    },
+                    {"file_name": "linker.py", "content": "# linker code"},
+                ]
+            )
+        }
+    }
 
     @field_validator("commit_files", mode="after")
     @classmethod

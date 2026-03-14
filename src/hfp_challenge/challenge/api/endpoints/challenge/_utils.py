@@ -7,6 +7,7 @@ import requests
 
 NETWORK_NAME = "internal_net"
 FINGERPRINTER_IMAGE = "redteamsubnet61/hfp_fingerprinter:latest"
+FINGERPRINTER_BUILD_PATH = "/app/rest-hfp-challenge/fingerprinter"
 FINGERPRINT_STORAGE: dict[str, str] = {}
 
 
@@ -63,12 +64,27 @@ def wait_for_health(
     )
 
 
+def _ensure_image(client: docker.DockerClient) -> None:
+    try:
+        client.images.get(FINGERPRINTER_IMAGE)
+    except docker.errors.NotFound:
+        try:
+            client.images.pull(FINGERPRINTER_IMAGE)
+        except docker.errors.NotFound:
+            client.images.build(
+                path=FINGERPRINTER_BUILD_PATH,
+                tag=FINGERPRINTER_IMAGE,
+                rm=True,
+            )
+
+
 def run_fingerprinter_container(
     request_id: str,
     files_dir: str,
 ) -> tuple[docker.models.containers.Container, str]:
     client = docker.from_env()
     ensure_network_exists()
+    _ensure_image(client)
 
     container_name = f"fingerprinter_{request_id}"
 

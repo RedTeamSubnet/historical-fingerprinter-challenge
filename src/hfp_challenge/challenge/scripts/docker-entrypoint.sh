@@ -8,7 +8,9 @@ echo "[INFO]: Running '${HFP_CHALLENGE_API_SLUG}' docker-entrypoint.sh..."
 _run()
 {
 	echo "[INFO]: Starting FastAPI server..."
-	exec gosu "${USER}:${GROUP}" python -m api || exit 2
+	sudo service docker start || exit 2
+	sleep 2
+	exec gosu "${USER}:docker" python -m api || exit 2
 	# exec gosu "${USER}:${GROUP}" uvicorn api.main:app \
 	# 	--host=0.0.0.0 \
 	# 	--port=${HFP_CHALLENGE_API_PORT:-10001} \

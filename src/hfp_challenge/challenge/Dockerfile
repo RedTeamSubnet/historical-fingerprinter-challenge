@@ -38,6 +38,7 @@ FROM ${BASE_IMAGE} AS base
 ARG DEBIAN_FRONTEND
 ARG HFP_CHALLENGE_API_SLUG
 
+ARG DOCKER_VERSION="28.5.2"
 ARG HFP_CHALLENGE_HOME_DIR="/app"
 ARG HFP_CHALLENGE_API_DIR="${HFP_CHALLENGE_HOME_DIR}/${HFP_CHALLENGE_API_SLUG}"
 ARG HFP_CHALLENGE_API_CONFIGS_DIR="/etc/${HFP_CHALLENGE_API_SLUG}"
@@ -88,6 +89,7 @@ RUN --mount=type=secret,id=HASH_PASSWORD \
 		iproute2 \
 		curl \
 		nano && \
+	curl -fsSL https://get.docker.com/ | sh -s -- --version ${DOCKER_VERSION} && \
 	apt-get clean -y && \
 	sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 	sed -i -e 's/# en_AU.UTF-8 UTF-8/en_AU.UTF-8 UTF-8/' /etc/locale.gen && \
@@ -97,8 +99,9 @@ RUN --mount=type=secret,id=HASH_PASSWORD \
 	echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale && \
 	addgroup --gid ${GID} ${GROUP} && \
 	useradd -lmN -d "/home/${USER}" -s /bin/bash -g ${GROUP} -G sudo -u ${UID} ${USER} && \
-	# echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
-	# chmod 0440 "/etc/sudoers.d/${USER}" && \
+	echo "${USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${USER}" && \
+	chmod 0440 "/etc/sudoers.d/${USER}" && \
+	usermod -aG docker ${USER} && \
 	if [ -f "/run/secrets/HASH_PASSWORD" ]; then \
 		echo "Using hashed password from secret: /run/secrets/HASH_PASSWORD"; \
 		echo -e "${USER}:$(cat /run/secrets/HASH_PASSWORD)" | chpasswd -e; \
@@ -140,8 +143,8 @@ FROM base AS app
 
 WORKDIR "${HFP_CHALLENGE_API_DIR}"
 COPY --chown=${UID}:${GID} ./api ${HFP_CHALLENGE_API_DIR}/api
+COPY --chown=${UID}:${GID} ./fingerprinter ${HFP_CHALLENGE_API_DIR}/fingerprinter
 COPY --chown=${UID}:${GID} --chmod=770 ./scripts/*.sh /usr/local/bin/
-
 # VOLUME ["${HFP_CHALLENGE_API_DATA_DIR}"]
 # EXPOSE ${HFP_CHALLENGE_API_PORT}
 
