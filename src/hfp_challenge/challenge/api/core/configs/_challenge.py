@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from enum import Enum
 from typing_extensions import Self
@@ -54,7 +52,7 @@ class ChallengeConfig(BaseConfig):
     single_request_timeout: int = Field(default=2, ge=1)
     acceptable_miss_count: int = Field(default=10, ge=0)
     fingerprinter_ip: str = Field(
-        "0.0.0.0", strip_whitespace=True, min_length=7, max_length=15
+        "127.0.0.1", strip_whitespace=True, min_length=7, max_length=15
     )
     fingerprinter_port: int = Field(default=8000, ge=1, le=65535)
     metrics_csv_path: str = Field(

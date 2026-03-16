@@ -14,11 +14,11 @@ This project provides an API that processes device fingerprint data from Fingerp
 
 ## Key Components
 
-| File | Description |
-|------|-------------|
-| `submissions/initializer.py` | DB connection and table setup |
+| File                               | Description                                                       |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| `submissions/initializer.py`       | DB connection and table setup                                     |
 | `submissions/metrics_collector.py` | Extracts fingerprint-relevant signals from raw FingerprintJS data |
-| `submissions/linker.py` | Generates fingerprint and links to existing records |
+| `submissions/linker.py`            | Generates fingerprint and links to existing records               |
 
 ## Database Schema
 
@@ -34,12 +34,15 @@ fingerprints (
 ## API Endpoints
 
 ### GET /health
+
 Health check endpoint.
 
 ### POST /fingerprint
+
 Generate a fingerprint from FingerprintJS products data.
 
 **Request:**
+
 ```json
 {
   "products": {
@@ -51,9 +54,10 @@ Generate a fingerprint from FingerprintJS products data.
 ```
 
 **Response:**
+
 ```json
 {
-  "fingerprint": "abc123...",
-  "is_new": true
+    "fingerprint": "abc123...",
+    "is_new": true
 }
 ```

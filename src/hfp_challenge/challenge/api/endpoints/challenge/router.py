@@ -85,9 +85,7 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
 
     try:
         service.score(request_id=_request_id, miner_output=miner_output)
-        logger.success(
-            f"[{_request_id}] - Successfully scored the miner output"
-        )
+        logger.success(f"[{_request_id}] - Successfully scored the miner output")
     except HTTPException:
         raise
     except Exception:

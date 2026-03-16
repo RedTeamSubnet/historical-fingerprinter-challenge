@@ -33,7 +33,9 @@ def ensure_network_exists() -> None:
     try:
         client.networks.get(config.challenge.fp_container.network_name)
     except docker.errors.NotFound:
-        client.networks.create(config.challenge.fp_container.network_name, driver="bridge", internal=True)
+        client.networks.create(
+            config.challenge.fp_container.network_name, driver="bridge", internal=True
+        )
 
 
 def wait_for_health(
@@ -46,8 +48,8 @@ def wait_for_health(
             resp = requests.get(url, timeout=5)
             if resp.status_code == 200 and resp.json().get("status") == "ok":
                 return
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error occurred while checking health: {e}")
         time.sleep(1)
     raise TimeoutError(
         f"Fingerprinter container health check timed out after {timeout}s in this url: {url}"
@@ -92,9 +94,9 @@ def run_fingerprinter_container(
     )
 
     container.reload()
-    ip_address = container.attrs["NetworkSettings"]["Networks"][config.challenge.fp_container.network_name][
-        "IPAddress"
-    ]
+    ip_address = container.attrs["NetworkSettings"]["Networks"][
+        config.challenge.fp_container.network_name
+    ]["IPAddress"]
 
     return container, ip_address
 

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 import re
-from typing import Optional
 
 from fastapi import Security
 from fastapi.security import APIKeyHeader
@@ -9,11 +7,10 @@ from api.config import config
 from api.core.constants import ErrorCodeEnum, ALPHANUM_HYPHEN_REGEX
 from api.core.exceptions import BaseHTTPException
 
-
 _auth_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
-def auth_api_key(api_key: Optional[str] = Security(_auth_header)) -> None:
+def auth_api_key(api_key: str | None = Security(_auth_header)) -> None:
 
     if (not api_key) or (not isinstance(api_key, str)) or (not api_key.strip()):
         raise BaseHTTPException(

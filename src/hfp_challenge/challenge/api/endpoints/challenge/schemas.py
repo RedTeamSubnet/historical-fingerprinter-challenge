@@ -20,7 +20,7 @@ try:
         for _detection_path in _submission_path.glob("*.py"):
             _file_stem = _detection_path.stem
             if _file_stem in _frameworks_names:
-                with open(_detection_path, "r") as _detection_file:
+                with open(_detection_path) as _detection_file:
                     _detection_files["commit_files"].append(
                         {
                             "file_name": _detection_path.name,
@@ -29,7 +29,7 @@ try:
                     )
 
 except Exception:
-    logger.exception(f"Failed to read detection files in detections folder!")
+    logger.exception("Failed to read detection files in detections folder!")
 
 
 class TaskStatusEnum(str, Enum):
@@ -107,7 +107,8 @@ class MinerOutput(BaseModel):
             _content_lines = _miner_file_pm.content.splitlines()
             if len(_content_lines) > config.challenge.submission_length_limit:
                 raise ValueError(
-                    f"`{_miner_file_pm.file_name}` file contains too many lines, should be <= {config.challenge.submission_length_limit} lines!"
+                    f"`{_miner_file_pm.file_name}` file contains too many lines, should be \
+                        <= {config.challenge.submission_length_limit} lines!"
                 )
             _miner_file_name = _miner_file_pm.file_name.strip().split(".")
             if _miner_file_name[-1] != "py":
@@ -116,7 +117,8 @@ class MinerOutput(BaseModel):
                 )
             elif _miner_file_name[0] not in config.challenge.submission_fns:
                 raise ValueError(
-                    f"`{_miner_file_pm.file_name}` file has invalid name, should be one of {config.challenge.submission_fns}!"
+                    f"`{_miner_file_pm.file_name}` file has invalid name, should be one of \
+                        {config.challenge.submission_fns}!"
                 )
 
         return val

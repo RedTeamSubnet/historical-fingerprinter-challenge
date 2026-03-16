@@ -16,8 +16,7 @@ def initialize_db(db_path: str | None = None) -> sqlite3.Connection:
 
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS fingerprints (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fingerprint TEXT UNIQUE NOT NULL,
@@ -67,8 +66,7 @@ def initialize_db(db_path: str | None = None) -> sqlite3.Connection:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """
-    )
+    """)
 
     conn.commit()
     logger.info(f"Database initialized at {db_path}")

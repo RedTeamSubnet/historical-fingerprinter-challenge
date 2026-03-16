@@ -26,35 +26,44 @@ def generate_fingerprint(payload: dict[str, Any]) -> str:
     return fingerprint
 
 
-def generate_and_link(payload: dict[str, Any], db_conn: sqlite3.Connection) -> dict[str, Any]:
+def generate_and_link(
+    payload: dict[str, Any], db_conn: sqlite3.Connection
+) -> dict[str, Any]:
     fingerprint = generate_fingerprint(payload)
 
     cursor = db_conn.cursor()
 
-    cursor.execute("""
-        SELECT id, fingerprint, created_at, last_seen 
-        FROM fingerprints 
+    cursor.execute(
+        """
+        SELECT id, fingerprint, created_at, last_seen
+        FROM fingerprints
         WHERE fingerprint = ?
-    """, (fingerprint,))
+    """,
+        (fingerprint,),
+    )
 
     existing = cursor.fetchone()
 
     if existing:
-        cursor.execute("""
-            UPDATE fingerprints 
-            SET last_seen = CURRENT_TIMESTAMP 
+        cursor.execute(
+            """
+            UPDATE fingerprints
+            SET last_seen = CURRENT_TIMESTAMP
             WHERE fingerprint = ?
-        """, (fingerprint,))
+        """,
+            (fingerprint,),
+        )
         db_conn.commit()
         logger.info(f"Updated existing fingerprint: {fingerprint[:16]}...")
         return {
             "fingerprint": fingerprint,
             "is_new": False,
             "id": existing["id"],
-            "created_at": existing["created_at"]
+            "created_at": existing["created_at"],
         }
     else:
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO fingerprints (
                 fingerprint,
                 architecture,
@@ -96,56 +105,53 @@ def generate_and_link(payload: dict[str, Any], db_conn: sqlite3.Connection) -> d
                 gpu_vendor,
                 browser_name,
                 browser_version
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            fingerprint,
-            payload.get("architecture"),
-            payload.get("audio_hash"),
-            payload.get("canvas_geometry"),
-            payload.get("canvas_text"),
-            payload.get("canvas_winding"),
-            payload.get("color_depth"),
-            payload.get("color_gamut"),
-            payload.get("contrast"),
-            payload.get("cookies_enabled"),
-            payload.get("cpu_class"),
-            payload.get("device_memory"),
-            payload.get("fonts"),
-            payload.get("font_preferences"),
-            payload.get("forced_colors"),
-            payload.get("hardware_concurrency"),
-            payload.get("hdr"),
-            payload.get("indexed_db"),
-            payload.get("inverted_colors"),
-            payload.get("languages"),
-            payload.get("local_storage"),
-            payload.get("math_signature"),
-            payload.get("monochrome"),
-            payload.get("open_database"),
-            payload.get("os_cpu"),
-            payload.get("pdf_viewer_enabled"),
-            payload.get("platform"),
-            payload.get("plugins_count"),
-            payload.get("reduced_motion"),
-            payload.get("screen_frame"),
-            payload.get("screen_resolution"),
-            payload.get("session_storage"),
-            payload.get("timezone"),
-            payload.get("max_touch_points"),
-            payload.get("vendor"),
-            payload.get("vendor_flavors"),
-            payload.get("gpu_renderer"),
-            payload.get("gpu_vendor"),
-            payload.get("browser_name"),
-            payload.get("browser_version")
-        ))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) """,  # noqa: E501
+            (
+                fingerprint,
+                payload.get("architecture"),
+                payload.get("audio_hash"),
+                payload.get("canvas_geometry"),
+                payload.get("canvas_text"),
+                payload.get("canvas_winding"),
+                payload.get("color_depth"),
+                payload.get("color_gamut"),
+                payload.get("contrast"),
+                payload.get("cookies_enabled"),
+                payload.get("cpu_class"),
+                payload.get("device_memory"),
+                payload.get("fonts"),
+                payload.get("font_preferences"),
+                payload.get("forced_colors"),
+                payload.get("hardware_concurrency"),
+                payload.get("hdr"),
+                payload.get("indexed_db"),
+                payload.get("inverted_colors"),
+                payload.get("languages"),
+                payload.get("local_storage"),
+                payload.get("math_signature"),
+                payload.get("monochrome"),
+                payload.get("open_database"),
+                payload.get("os_cpu"),
+                payload.get("pdf_viewer_enabled"),
+                payload.get("platform"),
+                payload.get("plugins_count"),
+                payload.get("reduced_motion"),
+                payload.get("screen_frame"),
+                payload.get("screen_resolution"),
+                payload.get("session_storage"),
+                payload.get("timezone"),
+                payload.get("max_touch_points"),
+                payload.get("vendor"),
+                payload.get("vendor_flavors"),
+                payload.get("gpu_renderer"),
+                payload.get("gpu_vendor"),
+                payload.get("browser_name"),
+                payload.get("browser_version"),
+            ),
+        )
         db_conn.commit()
         logger.info(f"Inserted new fingerprint: {fingerprint[:16]}...")
-        return {
-            "fingerprint": fingerprint,
-            "is_new": True,
-            "id": cursor.lastrowid
-        }
+        return {"fingerprint": fingerprint, "is_new": True, "id": cursor.lastrowid}
 
 
 __all__ = ["generate_fingerprint", "generate_and_link"]
