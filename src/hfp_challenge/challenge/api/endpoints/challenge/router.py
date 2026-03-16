@@ -7,7 +7,8 @@ from api.logger import logger
 from api.core.dependencies.auth import auth_api_key
 from .schemas import MinerInput, MinerOutput
 from . import service
-from ._utils import get_scoring_status, get_fingerprint_storage
+from ._utils import get_scoring_status
+from .payload_manager import payload_manager
 
 router = APIRouter(tags=["Challenge"])
 
@@ -36,7 +37,7 @@ def get_results(request: Request):
     _request_id = request.state.request_id
     logger.info(f"[{_request_id}] - Getting results...")
 
-    results = get_fingerprint_storage()
+    results = payload_manager.get_fingerprints()
     return results
 
 

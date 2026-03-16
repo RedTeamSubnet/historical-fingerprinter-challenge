@@ -11,8 +11,7 @@ from api.logger import logger
 
 from api.endpoints.challenge import _utils
 from .schemas import MinerInput, MinerOutput
-
-FINGERPRINT_STORAGE: dict[str, str] = {}
+from .payload_manager import payload_manager
 
 
 def get_task() -> MinerInput:
@@ -21,12 +20,10 @@ def get_task() -> MinerInput:
 
 @validate_call
 def score(request_id: str, miner_output: MinerOutput) -> None:
-    global FINGERPRINT_STORAGE
-
     if _utils.get_scoring_status() == _utils.ScoringStatus.SCORING:
         raise RuntimeError("Scoring is already in progress")
 
-    FINGERPRINT_STORAGE = {}
+    payload_manager.restart_manager()
     _request_miss_counter = 0
     container = None
 
@@ -71,10 +68,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                     resp.raise_for_status()
                     fingerprint = resp.json().get("fingerprint")
                     if fingerprint:
-                        FINGERPRINT_STORAGE[social_id] = fingerprint
-                        logger.info(
-                            f"[{request_id}] - Stored fingerprint for {social_id}"
-                        )
+                        payload_manager.store_fingerprint(social_id, fingerprint)
                     else:
                         logger.warning(
                             f"[{request_id}] - No fingerprint returned for {social_id}"
@@ -92,7 +86,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 logger.info(f"{index} is finished")
 
             logger.info(
-                f"[{request_id}] - Fingerprinting completed. Stored {len(FINGERPRINT_STORAGE)} fingerprints"
+                f"[{request_id}] - Fingerprinting completed. Stored {payload_manager.fingerprint_count()} fingerprints"
             )
 
         finally:

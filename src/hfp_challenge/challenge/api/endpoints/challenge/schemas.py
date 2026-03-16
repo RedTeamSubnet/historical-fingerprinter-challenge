@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +30,13 @@ try:
 
 except Exception:
     logger.exception(f"Failed to read detection files in detections folder!")
+
+
+class TaskStatusEnum(str, Enum):
+    CREATED = "created"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
 
 
 class MinerInput(BaseModel):
@@ -115,6 +123,7 @@ class MinerOutput(BaseModel):
 
 
 __all__ = [
+    "TaskStatusEnum",
     "MinerInput",
     "CommitFilePM",
     "MinerOutput",

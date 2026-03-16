@@ -7,11 +7,7 @@ import docker
 import requests
 
 from api.logger import logger
-
-NETWORK_NAME = "internal_net"
-FINGERPRINTER_IMAGE = "redteamsubnet61/hfp_fingerprinter:latest"
-FINGERPRINTER_BUILD_PATH = f"{os.getenv('HFP_CHALLENGE_API_DIR')}/fingerprinter"
-FINGERPRINT_STORAGE: dict[str, str] = {}
+from api.config import config
 
 
 class ScoringStatus(str, Enum):
@@ -32,21 +28,12 @@ def set_scoring_status(status: ScoringStatus) -> None:
     _scoring_status = status
 
 
-def get_fingerprint_storage() -> dict[str, str]:
-    return FINGERPRINT_STORAGE
-
-
-def clear_fingerprint_storage() -> None:
-    global FINGERPRINT_STORAGE
-    FINGERPRINT_STORAGE = {}
-
-
 def ensure_network_exists() -> None:
     client = docker.from_env()
     try:
-        client.networks.get(NETWORK_NAME)
+        client.networks.get(config.challenge.fp_container.network_name)
     except docker.errors.NotFound:
-        client.networks.create(NETWORK_NAME, driver="bridge", internal=True)
+        client.networks.create(config.challenge.fp_container.network_name, driver="bridge", internal=True)
 
 
 def wait_for_health(
@@ -69,14 +56,14 @@ def wait_for_health(
 
 def _ensure_image(client: docker.DockerClient) -> None:
     try:
-        client.images.get(FINGERPRINTER_IMAGE)
+        client.images.get(config.challenge.fp_container.image)
     except docker.errors.NotFound:
         try:
-            client.images.pull(FINGERPRINTER_IMAGE)
+            client.images.pull(config.challenge.fp_container.image)
         except docker.errors.NotFound:
             client.images.build(
-                path=FINGERPRINTER_BUILD_PATH,
-                tag=FINGERPRINTER_IMAGE,
+                path=config.challenge.fp_container.build_path,
+                tag=config.challenge.fp_container.image,
                 rm=True,
             )
 
@@ -96,16 +83,16 @@ def run_fingerprinter_container(
         target_path = f"/app/submissions/{file_name}"
         volumes[file_path] = {"bind": target_path, "mode": "ro"}
     container = client.containers.run(
-        FINGERPRINTER_IMAGE,
+        config.challenge.fp_container.image,
         detach=True,
-        network=NETWORK_NAME,
+        network=config.challenge.fp_container.network_name,
         environment={"PORT": str(fingerprinter_port)},
         volumes=volumes,
         name=container_name,
     )
 
     container.reload()
-    ip_address = container.attrs["NetworkSettings"]["Networks"][NETWORK_NAME][
+    ip_address = container.attrs["NetworkSettings"]["Networks"][config.challenge.fp_container.network_name][
         "IPAddress"
     ]
 

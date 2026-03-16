@@ -10,14 +10,14 @@ _run()
 	echo "[INFO]: Starting FastAPI server..."
 	sudo service docker start || exit 2
 	sleep 2
-	exec gosu "${USER}:docker" python -m api || exit 2
-	# exec gosu "${USER}:${GROUP}" uvicorn api.main:app \
-	# 	--host=0.0.0.0 \
-	# 	--port=${HFP_CHALLENGE_API_PORT:-10001} \
-	# 	--no-access-log \
-	# 	--no-server-header \
-	# 	--proxy-headers \
-	# 	--forwarded-allow-ips='*' || exit 2
+	# exec gosu "${USER}:${GROUP}" sg docker "exec python -m api" || exit 2
+	exec gosu "${USER}:${GROUP}" sg docker "exec uvicorn api.main:app \
+		--host=0.0.0.0 \
+		--port=${HFP_CHALLENGE_API_PORT:-10001} \
+		--no-access-log \
+		--no-server-header \
+		--proxy-headers \
+		--forwarded-allow-ips='*' " || exit 2
 	exit 0
 }
 
