@@ -70,6 +70,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                     if fingerprint:
                         payload_manager.store_fingerprint(social_id, fingerprint)
                     else:
+                        _request_miss_counter += 1
                         logger.warning(
                             f"[{request_id}] - No fingerprint returned for {social_id}"
                         )
