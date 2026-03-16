@@ -1,6 +1,6 @@
 import os
 import time
-from enum import Enum
+
 from threading import Thread
 
 import docker
@@ -8,24 +8,6 @@ import requests
 
 from api.logger import logger
 from api.config import config
-
-
-class ScoringStatus(str, Enum):
-    STARTED = "started"
-    SCORING = "scoring"
-    AVAILABLE = "available"
-
-
-_scoring_status = ScoringStatus.STARTED
-
-
-def get_scoring_status() -> ScoringStatus:
-    return _scoring_status
-
-
-def set_scoring_status(status: ScoringStatus) -> None:
-    global _scoring_status
-    _scoring_status = status
 
 
 def ensure_network_exists() -> None:

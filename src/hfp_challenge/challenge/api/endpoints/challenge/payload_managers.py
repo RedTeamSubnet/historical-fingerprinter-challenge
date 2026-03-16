@@ -1,4 +1,5 @@
 from api.logger import logger
+from enum import Enum
 
 
 class PayloadManager:
@@ -19,9 +20,29 @@ class PayloadManager:
         return len(self.fingerprints)
 
 
+class ScoringStatus(str, Enum):
+    STARTED = "started"
+    SCORING = "scoring"
+    AVAILABLE = "available"
+
+
+class ScoringStatusManager:
+    def __init__(self):
+        self._scoring_status = ScoringStatus.STARTED
+
+    def get_scoring_status(self) -> ScoringStatus:
+        return self._scoring_status
+
+    def set_scoring_status(self, status: ScoringStatus) -> None:
+        self._scoring_status = status
+
+
 payload_manager = PayloadManager()
+scoring_status_manager = ScoringStatusManager()
 
 __all__ = [
     "PayloadManager",
     "payload_manager",
+    "ScoringStatusManager",
+    "scoring_status_manager",
 ]

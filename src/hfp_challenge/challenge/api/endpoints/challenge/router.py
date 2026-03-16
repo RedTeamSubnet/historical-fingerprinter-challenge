@@ -7,8 +7,7 @@ from api.logger import logger
 from api.core.dependencies.auth import auth_api_key
 from .schemas import MinerInput, MinerOutput
 from . import service
-from ._utils import get_scoring_status
-from .payload_manager import payload_manager
+from .payload_managers import payload_manager, scoring_status_manager
 
 router = APIRouter(tags=["Challenge"])
 
@@ -23,7 +22,7 @@ def get_status(request: Request):
     _request_id = request.state.request_id
     logger.info(f"[{_request_id}] - Getting status...")
 
-    status = get_scoring_status()
+    status = scoring_status_manager.get_scoring_status()
     return {"status": status}
 
 

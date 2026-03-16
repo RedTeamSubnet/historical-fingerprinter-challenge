@@ -11,7 +11,7 @@ from api.logger import logger
 
 from api.endpoints.challenge import _utils
 from .schemas import MinerInput, MinerOutput
-from .payload_manager import payload_manager
+from .payload_managers import payload_manager, scoring_status_manager, ScoringStatus
 
 
 def get_task() -> MinerInput:
@@ -20,14 +20,14 @@ def get_task() -> MinerInput:
 
 @validate_call
 def score(request_id: str, miner_output: MinerOutput) -> None:
-    if _utils.get_scoring_status() == _utils.ScoringStatus.SCORING:
+    if scoring_status_manager.get_scoring_status() == ScoringStatus.SCORING:
         raise RuntimeError("Scoring is already in progress")
 
     payload_manager.restart_manager()
     _request_miss_counter = 0
     container = None
 
-    _utils.set_scoring_status(_utils.ScoringStatus.SCORING)
+    scoring_status_manager.set_scoring_status(ScoringStatus.SCORING)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         for file in miner_output.commit_files:
@@ -94,7 +94,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
             if container:
                 # _utils.cleanup_container(container)
                 logger.info(f"[{request_id}] - Fingerprinter container cleaned up")
-            _utils.set_scoring_status(_utils.ScoringStatus.AVAILABLE)
+            scoring_status_manager.set_scoring_status(ScoringStatus.AVAILABLE)
 
     return None
 
