@@ -51,17 +51,17 @@ class ScoringConfig(BaseModel):
     testcase_weights: dict[str, float] = Field(
         default_factory=lambda: {
             "webgl": 1.0,
-            "canvas": 1.0,
+            "webgpuliar": 1.0,
             "audio": 1.0,
             "fonts": 0.8,
         }
     )
     browser_weights: dict[str, float] = Field(
         default_factory=lambda: {
-            "Chrome": 1.0,
-            "Firefox": 1.0,
-            "Brave": 0.9,
-            "Safari": 0.9,
+            "chrome": 1.0,
+            "firefox": 1.0,
+            "brave": 0.9,
+            "safari": 0.9,
         }
     )
     collision_penalty: float = Field(default=0.3, ge=0.0, le=1.0)
