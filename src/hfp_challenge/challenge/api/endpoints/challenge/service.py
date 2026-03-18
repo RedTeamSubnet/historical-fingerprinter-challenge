@@ -28,7 +28,7 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
     container = None
 
     scoring_status_manager.set_scoring_status(ScoringStatus.SCORING)
-
+    final_score = 0.0
     with tempfile.TemporaryDirectory() as tmp_dir:
         for file in miner_output.commit_files:
             file_path = os.path.join(tmp_dir, file.file_name)
@@ -90,13 +90,17 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 f"[{request_id}] - Fingerprinting completed. Stored {payload_manager.fingerprint_count()} fingerprints"
             )
 
+            # Calculate and log final score
+            final_score = payload_manager.calculate_score()
+            logger.success(f"[{request_id}] - Final Score: {final_score:.3f}")
+
         finally:
             if container:
                 # _utils.cleanup_container(container)
                 logger.info(f"[{request_id}] - Fingerprinter container cleaned up")
             scoring_status_manager.set_scoring_status(ScoringStatus.AVAILABLE)
 
-    return None
+    return final_score
 
 
 __all__ = [

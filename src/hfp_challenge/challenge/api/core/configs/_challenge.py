@@ -47,6 +47,29 @@ class FingerpinterContainerConfig(BaseModel):
         return self
 
 
+class ScoringConfig(BaseModel):
+    testcase_weights: dict[str, float] = Field(
+        default_factory=lambda: {
+            "webgl": 1.0,
+            "canvas": 1.0,
+            "audio": 1.0,
+            "fonts": 0.8,
+        }
+    )
+    browser_weights: dict[str, float] = Field(
+        default_factory=lambda: {
+            "Chrome": 1.0,
+            "Firefox": 1.0,
+            "Brave": 0.9,
+            "Safari": 0.9,
+        }
+    )
+    collision_penalty: float = Field(default=0.3, ge=0.0, le=1.0)
+    fragmentation_penalty: float = Field(default=0.2, ge=0.0, le=1.0)
+    max_collision_threshold: int = Field(default=2, ge=1)
+    max_fragmentation_threshold: int = Field(default=3, ge=1)
+
+
 class ChallengeConfig(BaseConfig):
     api_key: SecretStr = Field(..., min_length=8, max_length=128)
     single_request_timeout: int = Field(default=2, ge=1)
@@ -71,6 +94,7 @@ class ChallengeConfig(BaseConfig):
     fp_container: FingerpinterContainerConfig = Field(
         default_factory=FingerpinterContainerConfig
     )
+    scoring: ScoringConfig = Field(default_factory=ScoringConfig)
     model_config = SettingsConfigDict(env_prefix=f"{ENV_PREFIX}CHALLENGE_")
 
 
@@ -79,4 +103,5 @@ __all__ = [
     "ChallengeStatusEnum",
     "FrameworkImageConfig",
     "FingerpinterContainerConfig",
+    "ScoringConfig",
 ]
