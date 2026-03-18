@@ -74,6 +74,7 @@ def run_fingerprinter_container(
         volumes=volumes,
         name=container_name,
     )
+    time.sleep(3)
 
     container.reload()
     ip_address = container.attrs["NetworkSettings"]["Networks"][
