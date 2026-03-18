@@ -13,7 +13,7 @@ class PayloadManager:
 
     def store_fingerprint(self, social_id: str, fingerprint: str) -> None:
         # Parse social_id: testcase_sendername_device_browser
-        parts = social_id.split("_")
+        parts = social_id.lower().split("_")
         if len(parts) != 4:
             logger.warning(f"Invalid social_id format: {social_id}")
             return
