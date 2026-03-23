@@ -81,9 +81,9 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
 
     _request_id = request.state.request_id
     logger.info(f"[{_request_id}] - Scoring the miner output...")
-
+    score = 0
     try:
-        service.score(request_id=_request_id, miner_output=miner_output)
+        score = service.score(request_id=_request_id, miner_output=miner_output)
         logger.success(f"[{_request_id}] - Successfully scored the miner output")
     except HTTPException:
         raise
@@ -94,7 +94,7 @@ def post_score(request: Request, miner_input: MinerInput, miner_output: MinerOut
             message="Failed to score the miner output!",
         )
 
-    return None
+    return score
 
 
 __all__ = ["router"]
