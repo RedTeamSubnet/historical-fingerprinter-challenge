@@ -18,14 +18,14 @@ Documentation page: <https://docs.theredteam.io/latest/challenges/historical-fin
 ### 1. 🚧 Prerequisites
 
 - Install [**docker** and **docker compose**](https://docs.docker.com/engine/install)
-    - Docker image: [**redteamsubnet61/rest-hfp-challenge**](https://hub.docker.com/r/redteamsubnet61/rest-hfp-challenge)
+    - Docker image: [**redteamsubnet61/historical_fingerprinter**](https://hub.docker.com/r/redteamsubnet61/historical_fingerprinter)
 
 [OPTIONAL] For **DEVELOPMENT** environment:
 
 - Install **Python (>= v3.10)** and **pip (>= 23)**:
     - **[RECOMMENDED] [Miniconda (v3)](https://www.anaconda.com/docs/getting-started/miniconda/install)**
-    - *[arm64/aarch64] [Miniforge (v3)](https://github.com/conda-forge/miniforge)*
-    - *[Python virtual environment] [venv](https://docs.python.org/3/library/venv.html)*
+    - _[arm64/aarch64] [Miniforge (v3)](https://github.com/conda-forge/miniforge)_
+    - _[Python virtual environment] [venv](https://docs.python.org/3/library/venv.html)_
 - Install [**git**](https://git-scm.com/downloads)
 - Setup an [**SSH key**](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
 
@@ -151,10 +151,10 @@ DEBUG=false
 
 ## -- API configs -- ##
 HFP_CHALLENGE_API_PORT=10001
-# HFP_CHALLENGE_API_CONFIGS_DIR="/etc/rest-hfp-challenge"
-# HFP_CHALLENGE_API_LOGS_DIR="/var/log/rest-hfp-challenge"
-# HFP_CHALLENGE_API_DATA_DIR="/var/lib/rest-hfp-challenge"
-# HFP_CHALLENGE_API_TMP_DIR="/tmp/rest-hfp-challenge"
+# HFP_CHALLENGE_API_CONFIGS_DIR="/etc/historical_fingerprinter"
+# HFP_CHALLENGE_API_LOGS_DIR="/var/log/historical_fingerprinter"
+# HFP_CHALLENGE_API_DATA_DIR="/var/lib/historical_fingerprinter"
+# HFP_CHALLENGE_API_TMP_DIR="/tmp/historical_fingerprinter"
 # HFP_CHALLENGE_API_VERSION="1"
 # HFP_CHALLENGE_API_PREFIX=""
 # HFP_CHALLENGE_API_DOCS_ENABLED=true

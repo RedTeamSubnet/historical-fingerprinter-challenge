@@ -5,7 +5,7 @@ ARG PYTHON_VERSION=3.10
 ARG BASE_IMAGE=python:${PYTHON_VERSION}-slim-trixie
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG HFP_CHALLENGE_API_SLUG="rest-hfp-challenge"
+ARG HFP_CHALLENGE_API_SLUG="historical_fingerprinter"
 
 
 ## Here is the builder image:

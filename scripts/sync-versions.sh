@@ -30,7 +30,7 @@ API_VERSION_FILE_PATH="${API_VERSION_FILE_PATH:-./src/hfp_challenge/challenge/ap
 MODULE_VERSION_FILE_PATH="${MODULE_VERSION_FILE_PATH:-./src/hfp_challenge/__version__.py}"
 COMPOSE_FILE_PATH="${COMPOSE_FILE_PATH:-./compose.yml}"
 SERVICE_NAME="${SERVICE_NAME:-challenge-api}"
-IMG_NAME="${IMG_NAME:-redteamsubnet61/rest-hfp-challenge}"
+IMG_NAME="${IMG_NAME:-redteamsubnet61/historical_fingerprinter}"
 
 # Flags:
 _IS_ADD=false

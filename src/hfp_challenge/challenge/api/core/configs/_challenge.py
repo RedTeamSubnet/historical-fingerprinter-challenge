@@ -14,7 +14,7 @@ from api.core.constants import ENV_PREFIX
 from ._base import BaseConfig
 
 _API_DIR_ENV = "HFP_CHALLENGE_API_DIR"
-_DEFAULT_API_DIR = "/app/rest-hfp-challenge"
+_DEFAULT_API_DIR = "/app/historical_fingerprinter"
 
 
 class ChallengeStatusEnum(str, Enum):
