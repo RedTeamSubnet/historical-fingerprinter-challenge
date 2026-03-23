@@ -127,14 +127,14 @@ class HFPController(Controller):
         _scoring_log = miner_commit.scoring_logs[0]
         for i, miner_input in enumerate(challenge_inputs):
 
-            _higest_comparison_score = miner_commit.get_higest_comparison_score()
+            _highest_comparison_score = miner_commit.get_higest_comparison_score()
             if (
-                _higest_comparison_score >= self.comparison_min_acceptable_score
-                or _higest_comparison_score == 0.0
+                _highest_comparison_score >= self.comparison_min_acceptable_score
+                or _highest_comparison_score == 0.0
             ):
                 bt.logging.info(
                     f"[CONTROLLER - MyController] Skipping scoring for miner {miner_commit.miner_hotkey} on task {i} "
-                    f"due to high comparison score: {_higest_comparison_score}"
+                    f"due to high comparison score: {_highest_comparison_score}"
                 )
                 _scoring_log.score = 0.0
                 if _scoring_log.error:
