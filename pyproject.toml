@@ -36,7 +36,7 @@ dynamic = ["version", "dependencies", "optional-dependencies"]
 # namespaces = false
 
 [tool.setuptools.dynamic]
-version = { attr = "historical_fingerprinter.__version__.__version__" }
+version = { attr = "hfp_challenge.__version__" }
 dependencies = { file = "./requirements.txt" }
 
 [tool.setuptools.dynamic.optional-dependencies]
