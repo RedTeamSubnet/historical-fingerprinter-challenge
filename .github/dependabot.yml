@@ -4,15 +4,23 @@ updates:
     directory: "/"
     labels:
       - "dependency"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "pip"
+    directory: "/src/hfp_challenge/challenge"
+    labels:
+      - "dependency"
+    open-pull-requests-limit: 3
     schedule:
       interval: "weekly"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/src/hfp_challenge/challenge"
     labels:
       - "dependency"
       - "docker"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     schedule:
       interval: "weekly"

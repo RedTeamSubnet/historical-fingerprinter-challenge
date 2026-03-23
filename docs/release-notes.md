@@ -13,5 +13,3 @@ hide:
 
 
 **Full Changelog**: https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/commits/v0.0.1
-
-
