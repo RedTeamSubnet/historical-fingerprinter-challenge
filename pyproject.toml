@@ -3,13 +3,13 @@ requires = ["setuptools>=70.3.0,<83.0.0", "setuptools-scm>=8.0.4,<10.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hfp_challenge"
+name = "historical_fingerprinter"
 authors = [{ name = "RedTeam Subnet", email = "noreply@theredteam.io" }]
 description = "This is a RedTeam Subnet's historical fingerprinter challenge repository."
 readme = "README.md"
 requires-python = ">=3.10,<4.0"
 keywords = [
-	"hfp_challenge",
+	"historical_fingerprinter",
 	"bittensor",
 	"redteam",
 	"subnet",
@@ -32,11 +32,11 @@ dynamic = ["version", "dependencies", "optional-dependencies"]
 
 # [tool.setuptools.packages.find]
 # where = ["src"]
-# include = ["hfp_challenge*"]
+# include = ["historical_fingerprinter*"]
 # namespaces = false
 
 [tool.setuptools.dynamic]
-version = { attr = "hfp_challenge.__version__.__version__" }
+version = { attr = "historical_fingerprinter.__version__.__version__" }
 dependencies = { file = "./requirements.txt" }
 
 [tool.setuptools.dynamic.optional-dependencies]
