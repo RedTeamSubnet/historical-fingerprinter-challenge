@@ -9,7 +9,7 @@ from redteam_core.challenge_pool import docker_utils
 from redteam_core.config.main import constants
 
 
-class MyController(Controller):
+class HFPController(Controller):
 
     def __init__(
         self,
@@ -191,5 +191,5 @@ class MyController(Controller):
 
 
 __all__ = [
-    "MyController",
+    "HFPController",
 ]
