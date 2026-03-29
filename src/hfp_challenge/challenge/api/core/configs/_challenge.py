@@ -50,18 +50,26 @@ class FingerpinterContainerConfig(BaseModel):
 class ScoringConfig(BaseModel):
     testcase_weights: dict[str, float] = Field(
         default_factory=lambda: {
-            "webgl": 1.0,
-            "webgpuliar": 1.0,
-            "audio": 1.0,
-            "fonts": 0.8,
+            "vpnstealth": 10.0,
+            "audiohardwareshift": 8.0,
+            "deepmobilespoof": 7.0,
+            "incognito": 6.0,
+            "webgpuliar": 6.0,
+            "canvasspoofer": 5.0,
+            "fontsshielded": 5.0,
+            "dirtydom": 5.0,
+            "mediagranted": 5.0,
+            "crossbrowser": 3.0,
         }
     )
     browser_weights: dict[str, float] = Field(
         default_factory=lambda: {
+            "tor": 4.0,
+            "firefox": 3.0,
+            "yandex": 3.0,
+            "brave": 2.0,
+            "safari": 2.0,
             "chrome": 1.0,
-            "firefox": 1.0,
-            "brave": 0.9,
-            "safari": 0.9,
         }
     )
     collision_penalty: float = Field(default=0.3, ge=0.0, le=1.0)
