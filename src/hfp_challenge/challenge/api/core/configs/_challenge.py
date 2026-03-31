@@ -41,7 +41,7 @@ class FingerpinterContainerConfig(BaseModel):
 
     @model_validator(mode="after")
     def _expand_paths(self) -> Self:
-        api_dir = os.getenv("HFP_CHALLENGE_API_DIR", _DEFAULT_API_DIR)
+        api_dir = os.getenv(_API_DIR_ENV, _DEFAULT_API_DIR)
         if "{api_dir}" in self.build_path:
             self.build_path = self.build_path.format(api_dir=api_dir)
         return self
@@ -87,7 +87,7 @@ class ChallengeConfig(BaseConfig):
     )
     fingerprinter_port: int = Field(default=8000, ge=1, le=65535)
     metrics_csv_path: str = Field(
-        ..., strip_whitespace=True, min_length=2, max_length=256
+        "{data_dir}/metrics.csv", strip_whitespace=True, min_length=2, max_length=256
     )
     submission_fns: list[str] = Field(
         default=["initializer", "metrics_collector", "linker"], min_items=1
@@ -104,6 +104,27 @@ class ChallengeConfig(BaseConfig):
     )
     scoring: ScoringConfig = Field(default_factory=ScoringConfig)
     model_config = SettingsConfigDict(env_prefix=f"{ENV_PREFIX}CHALLENGE_")
+
+    @model_validator(mode="after")
+    def _check_all(self) -> Self:
+        DATA_DIR = os.getenv(
+            f"{ENV_PREFIX}CHALLENGE_API_DATA_DIR", "/var/lib/historical_fingerprinter/"
+        )
+        if not os.path.isdir(DATA_DIR):
+            os.makedirs(DATA_DIR, exist_ok=True)
+
+        if "{data_dir}" in self.metrics_csv_path:
+            self.metrics_csv_path = self.metrics_csv_path.format(data_dir=DATA_DIR)
+
+        elif not os.path.isdir(os.path.dirname(self.metrics_csv_path)):
+            os.makedirs(os.path.dirname(self.metrics_csv_path), exist_ok=True)
+
+        if not os.access(os.path.dirname(self.metrics_csv_path), os.W_OK):
+            raise ValueError(
+                f"Directory for metrics CSV not writable: {os.path.dirname(self.metrics_csv_path)}"
+            )
+
+        return self
 
 
 __all__ = [

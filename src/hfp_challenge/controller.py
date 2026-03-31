@@ -158,10 +158,10 @@ class HFPController(Controller):
     def _save_result_to_data_folder(
         self, result_payload: dict, docker_hub_id: str
     ) -> None:
-        hfp_data_folder = os.environ.get("HFP_DATA_FOLDER")
+        hfp_data_folder = os.environ.get("HFP_CHALLENGE_API_DATA_DIR")
         if not hfp_data_folder:
             bt.logging.warning(
-                "[CONTROLLER] HFP_DATA_FOLDER environment variable not set, skipping result save"
+                "[CONTROLLER] HFP_CHALLENGE_API_DATA_DIR environment variable not set, skipping result save"
             )
             return
         os.makedirs(hfp_data_folder, exist_ok=True)
