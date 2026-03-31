@@ -1,8 +1,10 @@
 import sys
 import logging
 from contextlib import asynccontextmanager
+from uuid import uuid4
 
-from fastapi import FastAPI, Body, HTTPException
+from fastapi import FastAPI, Body, HTTPException, Request
+
 from data_types import FingerprintInput, FingerprintOutput
 from submissions import initialize_db, generate_and_link, preprocess_metrics
 
@@ -33,15 +35,26 @@ def health():
 
 
 @app.post("/fingerprint", response_model=FingerprintOutput)
-def fingerprint(fingerprint_input: FingerprintInput = Body(...)) -> FingerprintOutput:
+def fingerprint(
+    request: Request, fingerprint_input: FingerprintInput = Body(...)
+) -> FingerprintOutput:
     logger.info("Processing fingerprint request...")
-
+    # Generate a unique request ID for tracing
+    _request_id: str = uuid4().hex
+    if "X-Request-ID" in request.headers:
+        _request_id: str = request.headers.get("X-Request-ID", _request_id)
+    elif "X-Correlation-ID" in request.headers:
+        _request_id: str = request.headers.get("X-Correlation-ID", _request_id)
     try:
+        logger.info(f"Received products: {fingerprint_input.products}")
         payload = preprocess_metrics(fingerprint_input.products)
         result = generate_and_link(payload, app.state.db)
 
         return FingerprintOutput(
-            fingerprint=result["fingerprint"], is_new=result["is_new"], payload=payload
+            fingerprint=result["fingerprint"],
+            is_new=result["is_new"],
+            payload=payload,
+            request_id=_request_id,
         )
     except Exception as err:
         logger.error(f"Failed to process fingerprint: {str(err)}")

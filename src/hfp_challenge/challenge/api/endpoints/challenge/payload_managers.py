@@ -12,7 +12,7 @@ class PayloadManager:
         self.fingerprints = []
 
     def store_fingerprint(
-        self, social_id: str, fingerprint: str, payload: dict
+        self, social_id: str, fingerprint: str, payload: dict, request_id: str = None
     ) -> None:
         # Parse social_id: testcase_sendername_device_browser
         parts = social_id.lower().split("_")
@@ -31,6 +31,7 @@ class PayloadManager:
                 "browser": browser,
                 "fingerprint": fingerprint,
                 "payload": payload,
+                "request_id": request_id,
             }
         )
         logger.info(f"Stored fingerprint for {social_id}")

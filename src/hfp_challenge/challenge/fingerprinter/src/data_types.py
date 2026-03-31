@@ -5,7 +5,7 @@ class FingerprintInput(BaseModel):
     products: dict = Field(
         ...,
         title="Products",
-        description="Raw FingerprintJS products data.",
+        description="Raw CreepJS products data.",
     )
 
 
@@ -24,6 +24,11 @@ class FingerprintOutput(BaseModel):
         ...,
         title="Payload",
         description="Output of a preprocessing step.",
+    )
+    request_id: str = Field(
+        ...,
+        title="Request ID",
+        description="Unique identifier for the request, used for tracking and scoring.",
     )
 
 

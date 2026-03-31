@@ -59,6 +59,9 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 logger.info(f"{index} is started")
                 social_id = str(row["social_id"])
                 user_metrics = json.loads(str(row["user_metrics"]))
+                logger.info(
+                    f"[{request_id}] - Processing social_id: {social_id}, user_metrics: {str(user_metrics)[:150]}..."
+                )
                 try:
                     resp = requests.post(
                         f"{base_url}/fingerprint",
@@ -69,8 +72,12 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                     fingerprint = resp.json().get("fingerprint")
                     payload = resp.json().get("payload")
                     if fingerprint:
+                        # send payload with request id from resp
                         payload_manager.store_fingerprint(
-                            social_id, fingerprint, payload
+                            social_id,
+                            fingerprint,
+                            payload,
+                            resp.json().get("request_id"),
                         )
                     else:
                         _request_miss_counter += 1
