@@ -6,6 +6,14 @@ hide:
 
 # 📌 Release Notes
 
+## v0.0.5 (2026-03-31)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+
+
+**Full Changelog**: https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/compare/v0.0.4...v0.0.5
+
 ## v0.0.4 (2026-03-28)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
