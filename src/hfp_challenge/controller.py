@@ -58,7 +58,7 @@ class HFPController(Controller):
                 self._run_reference_comparison_inputs(miner_commit)
                 self._score_miner_with_new_inputs(miner_commit, challenge_inputs)
 
-                result_payload = self._get_result_from_challenge()
+                result_payload = self._get_results_from_challenge()
                 if result_payload:
                     self._save_result_to_data_folder(
                         result_payload, miner_commit.docker_hub_id
@@ -143,8 +143,8 @@ class HFPController(Controller):
         miner_output["commit_files"] = None
         reference_output["commit_files"] = None
 
-    def _get_result_from_challenge(self) -> dict:
-        result_url = "http://localhost:100001/result"
+    def _get_results_from_challenge(self) -> dict:
+        result_url = "http://localhost:10001/results"
         try:
             response = requests.get(result_url, timeout=5, verify=False)  # nosec
             response.raise_for_status()
@@ -165,7 +165,10 @@ class HFPController(Controller):
             )
             return
         os.makedirs(hfp_data_folder, exist_ok=True)
-        result_file_path = os.path.join(hfp_data_folder, f"{docker_hub_id}_result.json")
+        _docker_hub_id = docker_hub_id.split("/")[-1]
+        result_file_path = os.path.join(
+            hfp_data_folder, f"{_docker_hub_id}_result.json"
+        )
         with open(result_file_path, "w") as f:
             f.write(json.dumps(result_payload, indent=4))
         bt.logging.info(f"[CONTROLLER] Result saved to {result_file_path}")
