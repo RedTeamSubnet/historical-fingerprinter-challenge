@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 def preprocess_metrics(raw_metrics: dict[str, Any]) -> dict[str, Any]:
     payload = {}
-
     # Canvas 2D
     canvas2d = raw_metrics.get("canvas2d", {})
     if canvas2d:
@@ -64,7 +63,6 @@ def preprocess_metrics(raw_metrics: dict[str, Any]) -> dict[str, Any]:
 
     # Filter out empty values
     payload = {k: v for k, v in payload.items() if v is not None and v != ""}
-
     logger.info(f"Preprocessed metrics: {list(payload.keys())}")
     return payload
 

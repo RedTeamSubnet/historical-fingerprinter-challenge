@@ -1,10 +1,10 @@
 # Historical Fingerprinter
 
-Fingerprint-based identification API using FingerprintJS signals.
+Fingerprint-based identification API using CreepJS signals.
 
 ## Overview
 
-This project provides an API that processes device fingerprint data from FingerprintJS products and generates unique identifiers. It extracts key device signals (canvas, audio, browser details, fonts, IP info, etc.) to create stable fingerprints stored in SQLite.
+This project provides an API that processes device fingerprint data from CreepJS products and generates unique identifiers. It extracts key device signals (canvas, audio, browser details, fonts, IP info, etc.) to create stable fingerprints stored in SQLite.
 
 ## Architecture
 
@@ -14,11 +14,11 @@ This project provides an API that processes device fingerprint data from Fingerp
 
 ## Key Components
 
-| File                               | Description                                                       |
-| ---------------------------------- | ----------------------------------------------------------------- |
-| `submissions/initializer.py`       | DB connection and table setup                                     |
-| `submissions/metrics_collector.py` | Extracts fingerprint-relevant signals from raw FingerprintJS data |
-| `submissions/linker.py`            | Generates fingerprint and links to existing records               |
+| File                               | Description                                                 |
+| ---------------------------------- | ----------------------------------------------------------- |
+| `submissions/initializer.py`       | DB connection and table setup                               |
+| `submissions/metrics_collector.py` | Extracts fingerprint-relevant signals from raw CreepJS data |
+| `submissions/linker.py`            | Generates fingerprint and links to existing records         |
 
 ## Database Schema
 
@@ -39,7 +39,7 @@ Health check endpoint.
 
 ### POST /fingerprint
 
-Generate a fingerprint from FingerprintJS products data.
+Generate a fingerprint from CreepJS products data.
 
 **Request:**
 
