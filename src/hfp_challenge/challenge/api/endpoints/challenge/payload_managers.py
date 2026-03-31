@@ -11,7 +11,9 @@ class PayloadManager:
     def restart_manager(self) -> None:
         self.fingerprints = []
 
-    def store_fingerprint(self, social_id: str, fingerprint: str) -> None:
+    def store_fingerprint(
+        self, social_id: str, fingerprint: str, payload: dict
+    ) -> None:
         # Parse social_id: testcase_sendername_device_browser
         parts = social_id.lower().split("_")
         if len(parts) != 4:
@@ -28,6 +30,7 @@ class PayloadManager:
                 "device": device,
                 "browser": browser,
                 "fingerprint": fingerprint,
+                "payload": payload,
             }
         )
         logger.info(f"Stored fingerprint for {social_id}")

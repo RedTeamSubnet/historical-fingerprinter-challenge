@@ -67,8 +67,11 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                     )
                     resp.raise_for_status()
                     fingerprint = resp.json().get("fingerprint")
+                    payload = resp.json().get("payload")
                     if fingerprint:
-                        payload_manager.store_fingerprint(social_id, fingerprint)
+                        payload_manager.store_fingerprint(
+                            social_id, fingerprint, payload
+                        )
                     else:
                         _request_miss_counter += 1
                         logger.warning(

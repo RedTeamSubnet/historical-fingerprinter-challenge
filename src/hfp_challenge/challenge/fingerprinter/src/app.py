@@ -41,7 +41,7 @@ def fingerprint(fingerprint_input: FingerprintInput = Body(...)) -> FingerprintO
         result = generate_and_link(payload, app.state.db)
 
         return FingerprintOutput(
-            fingerprint=result["fingerprint"], is_new=result["is_new"]
+            fingerprint=result["fingerprint"], is_new=result["is_new"], payload=payload
         )
     except Exception as err:
         logger.error(f"Failed to process fingerprint: {str(err)}")

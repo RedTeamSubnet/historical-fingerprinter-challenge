@@ -20,6 +20,11 @@ class FingerprintOutput(BaseModel):
         title="Is New",
         description="Whether this is a new fingerprint.",
     )
+    payload: dict = Field(
+        ...,
+        title="Payload",
+        description="Output of a preprocessing step.",
+    )
 
 
 __all__ = [
