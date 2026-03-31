@@ -37,11 +37,6 @@ class HFPController(Controller):
         """
         Initiates the challenge lifecycle by setting up and executing the challenge Docker container.
         """
-        if self._is_scoring_in_progress():
-            bt.logging.info(
-                "[CONTROLLER] Skipping start_challenge because the status endpoint reports scoring"
-            )
-            return None
         self._setup_challenge()
         num_task = self.challenge_info.get(
             "num_tasks", constants.N_CHALLENGES_PER_EPOCH
@@ -174,28 +169,6 @@ class HFPController(Controller):
         with open(result_file_path, "w") as f:
             f.write(json.dumps(result_payload, indent=4))
         bt.logging.info(f"[CONTROLLER] Result saved to {result_file_path}")
-
-    def _is_scoring_in_progress(self) -> bool:
-        """Check if the external challenge status endpoint reports active scoring."""
-        status_url = "http://localhost:100001/status"
-        try:
-            response = requests.get(status_url, timeout=5, verify=False)  # nosec
-            response.raise_for_status()
-            payload = response.json() if response.content else {}
-        except Exception as exc:
-            bt.logging.debug(
-                f"[CONTROLLER] Unable to reach challenge status endpoint ({exc}); continuing"
-            )
-            return False
-        status_value = None
-        if isinstance(payload, dict):
-            status_value = payload.get("status") or payload.get("state")
-        if isinstance(status_value, str) and status_value.lower() == "scoring":
-            bt.logging.warning(
-                "[CONTROLLER] Challenge status endpoint reports scoring in progress"
-            )
-            return True
-        return False
 
 
 __all__ = [
