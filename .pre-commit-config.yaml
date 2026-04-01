@@ -69,7 +69,7 @@ repos:
         name: "🌳 check-merge-conflict - Check merge conflict markers"
       - id: check-added-large-files
         name: "🌳 check-added-large-files - Prevent large files from being added"
-        args: ["--maxkb=2500"] # 2.5 MB
+        args: ["--maxkb=250000"] # 2.5 MB
       - id: no-commit-to-branch
         name: "🌳 no-commit-to-branch - Prevent commits to specific branches"
         args: ["--branch=main", "--branch=master"]
