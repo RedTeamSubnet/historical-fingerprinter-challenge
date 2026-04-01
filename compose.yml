@@ -13,7 +13,6 @@ services:
       - path: .env
         required: false
     volumes:
-      - "./volumes/configs/historical_fingerprinter:${HFP_CHALLENGE_API_CONFIGS_DIR:-/etc/historical_fingerprinter}"
       - "./volumes/storage/historical_fingerprinter/logs:${HFP_CHALLENGE_API_LOGS_DIR:-/var/log/historical_fingerprinter                                                                                                                                                                                                                       }"
       - "./volumes/storage/historical_fingerprinter/data:${HFP_CHALLENGE_API_DATA_DIR:-/var/lib/historical_fingerprinter}"
     ports:
