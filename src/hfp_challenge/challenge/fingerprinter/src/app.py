@@ -46,7 +46,6 @@ def fingerprint(
     elif "X-Correlation-ID" in request.headers:
         _request_id: str = request.headers.get("X-Correlation-ID", _request_id)
     try:
-        logger.info(f"Received products: {fingerprint_input.products}")
         payload = preprocess_metrics(fingerprint_input.products)
         result = generate_and_link(payload, app.state.db)
 
