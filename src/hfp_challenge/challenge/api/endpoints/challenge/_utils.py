@@ -1,6 +1,7 @@
 import os
 import time
 
+from dataclasses import dataclass
 from threading import Thread
 
 import docker
@@ -8,6 +9,12 @@ import requests
 
 from api.logger import logger
 from api.config import config
+
+
+@dataclass
+class ContainerStatsResult:
+    network_rx_bytes: int = 0
+    network_tx_bytes: int = 0
 
 
 def ensure_network_exists() -> None:
@@ -105,3 +112,36 @@ def start_log_streaming_thread(
     thread = Thread(target=stream_container_logs, args=(container, prefix), daemon=True)
     thread.start()
     return thread
+
+
+def get_container_network_stats(
+    container: docker.models.containers.Container,
+) -> ContainerStatsResult:
+    try:
+        stats = container.stats(stream=False)
+        logger.debug(f"Container stats: {stats}")
+        networks = stats.get("networks") or {}
+        rx_bytes = 0
+        tx_bytes = 0
+        for iface_stats in networks.values():
+            if isinstance(iface_stats, dict):
+                rx_bytes += iface_stats.get("rx_bytes", 0)
+                tx_bytes += iface_stats.get("tx_bytes", 0)
+        return ContainerStatsResult(
+            network_rx_bytes=rx_bytes, network_tx_bytes=tx_bytes
+        )
+    except Exception as e:
+        logger.warning(f"Error fetching network stats: {e}")
+        return ContainerStatsResult()
+
+
+__all__ = [
+    "ensure_network_exists",
+    "wait_for_health",
+    "run_fingerprinter_container",
+    "cleanup_container",
+    "stream_container_logs",
+    "start_log_streaming_thread",
+    "get_container_network_stats",
+    "ContainerStatsResult",
+]
