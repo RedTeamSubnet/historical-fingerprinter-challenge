@@ -5,9 +5,13 @@ from api.core.constants import ErrorCodeEnum
 from api.core.exceptions import BaseHTTPException
 from api.logger import logger
 from api.core.dependencies.auth import auth_api_key
-from .schemas import MinerInput, MinerOutput
+from .schemas import MinerInput, MinerOutput, ScoringTelemetryResponse
 from . import service
-from .payload_managers import payload_manager, scoring_status_manager
+from .payload_managers import (
+    payload_manager,
+    scoring_status_manager,
+    scoring_telemetry_manager,
+)
 
 router = APIRouter(tags=["Challenge"])
 
@@ -38,6 +42,21 @@ def get_results(request: Request):
 
     results = payload_manager.get_fingerprints()
     return results
+
+
+@router.get(
+    "/telemetry",
+    summary="Get telemetry",
+    description="This endpoint returns the scoring telemetry from the latest run.",
+    response_class=JSONResponse,
+    response_model=ScoringTelemetryResponse,
+)
+def get_telemetry(request: Request):
+    _request_id = request.state.request_id
+    logger.info(f"[{_request_id}] - Getting telemetry...")
+
+    telemetry = scoring_telemetry_manager.get_telemetry()
+    return telemetry
 
 
 @router.get(
