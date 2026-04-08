@@ -147,7 +147,7 @@ class PayloadManager:
         _collision_percentile = _collided_fingerprints_count / len(fingerprints)
         if _collision_percentile > collision_threshold_percent:
             return 0.0, _collided_fingerprints
-        _collision_score = 0.5 - (_collision_percentile / collision_threshold_percent)
+        _collision_score = 1 - (_collision_percentile / collision_threshold_percent)
 
         return round(_collision_score, 3), _collided_fingerprints
 
@@ -181,7 +181,7 @@ class PayloadManager:
 
         if _fragmentation_percentile > fragmentation_threshold_percent:
             return 0.0, fragmented_fingerprints
-        _fragmentation_score = 0.5 - (
+        _fragmentation_score = 1 - (
             _fragmentation_percentile / fragmentation_threshold_percent
         )
 
