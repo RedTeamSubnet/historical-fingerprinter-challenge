@@ -28,7 +28,7 @@ def get_task() -> MinerInput:
 def score(request_id: str, miner_output: MinerOutput) -> None:
     if scoring_status_manager.get_scoring_status() == ScoringStatus.SCORING:
         raise RuntimeError("Scoring is already in progress")
-
+    runtime_seconds = 0.0
     payload_manager.restart_manager()
     _request_miss_counter = 0
     container = None
