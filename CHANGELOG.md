@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.1.1 (2026-04-08)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+
+
+**Full Changelog**: https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/compare/v1.1.0...v1.1.1
+
 ## v1.1.0 (2026-04-08)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
