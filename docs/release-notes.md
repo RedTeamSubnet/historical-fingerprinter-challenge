@@ -6,6 +6,19 @@ hide:
 
 # 📌 Release Notes
 
+## v1.1.0 (2026-04-08)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### ✨ Features
+* Rt 477 add method to extract metadata in hfp challenge by @aliyuldashev in https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/pull/5
+
+## New Contributors
+* @aliyuldashev made their first contribution in https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/pull/5
+
+**Full Changelog**: https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/compare/v1.0.1...v1.1.0
+
 ## v1.0.1 (2026-04-01)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
