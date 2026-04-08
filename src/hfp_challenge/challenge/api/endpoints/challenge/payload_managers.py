@@ -8,12 +8,12 @@ from typing import Optional
 
 @dataclass
 class ScoringTelemetry:
-    request_id: Optional[str] = None
+    request_id: str | None = None
     total_file_size_bytes: int = 0
     runtime_seconds: float = 0.0
     network_rx_bytes: int = 0
     network_tx_bytes: int = 0
-    score: Optional[float] = None
+    score: float | None = None
 
 
 class ScoringTelemetryManager:
@@ -22,12 +22,12 @@ class ScoringTelemetryManager:
 
     def set_telemetry(
         self,
-        request_id: Optional[str] = None,
+        request_id: str | None = None,
         total_file_size_bytes: int = 0,
         runtime_seconds: float = 0.0,
         network_rx_bytes: int = 0,
         network_tx_bytes: int = 0,
-        score: Optional[float] = None,
+        score: float | None = None,
     ) -> None:
         self._latest = ScoringTelemetry(
             request_id=request_id,
@@ -92,57 +92,128 @@ class PayloadManager:
 
         scoring_cfg = config.challenge.scoring
 
-        device_browser_fps = defaultdict(list)
-        for fp in self.fingerprints:
-            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
-            device_browser_fps[key].append(fp)
-
-        fp_to_devices = defaultdict(set)
-        for key, fps in device_browser_fps.items():
-            device_key = "_".join(key.split("_")[:-1])
-            browser = key.split("_")[-1]
-            for fp in fps:
-                fp_to_devices[(fp["fingerprint"], browser)].add(device_key)
-
-        total_score = 0.0
-        total_weight = 0.0
-
-        for fp in self.fingerprints:
-            testcase_weight = scoring_cfg.testcase_weights.get(fp["testcase"], 0.5)
-            browser_weight = scoring_cfg.browser_weights.get(fp["browser"], 0.5)
-            base_score = testcase_weight * browser_weight
-
-            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
-            unique_fps = {f["fingerprint"] for f in device_browser_fps[key]}
-            fragmentation_count = len(unique_fps)
-
-            collision_count = len(fp_to_devices[(fp["fingerprint"], fp["browser"])])
-
-            score = base_score
-
-            if fragmentation_count >= scoring_cfg.max_fragmentation_threshold:
-                score = 0.0
-            elif fragmentation_count > 1:
-                score *= 1 - scoring_cfg.fragmentation_penalty * (
-                    fragmentation_count - 1
-                )
-
-            if collision_count >= scoring_cfg.max_collision_threshold:
-                score = 0.0
-            elif collision_count > 1:
-                score *= 1 - scoring_cfg.collision_penalty * (collision_count - 1)
-
-            total_score += max(0.0, score)
-            total_weight += base_score
-
-        if total_weight > 0:
-            final_score = total_score / total_weight
-        else:
+        collision_score, collided_fps = self.score_collision(
+            self.fingerprints, scoring_cfg.max_collision_threshold
+        )
+        fragmentation_score, fragmented_fps = self.score_fragmentation(
+            self.fingerprints,
+            collided_fps,
+            scoring_cfg.max_fragmentation_threshold,
+        )
+        weighted_score = self.score_testcase_n_browser(
+            self.fingerprints,
+            scoring_cfg.testcase_weights,
+            scoring_cfg.browser_weights,
+            collided_fps,
+        )
+        logger.info(
+            f"Scores - Collision: {collision_score} \nFragmentation: {fragmentation_score} \nWeighted: {weighted_score}"
+        )
+        if collision_score == 0.0 or fragmentation_score == 0.0:
             final_score = 0.0
-
-        final_score = max(0.0, min(1.0, final_score))
-        logger.info(f"Final score: {final_score:.3f}")
+        else:
+            final_score = (
+                (collision_score * 0.4)
+                + (fragmentation_score * 0.4)
+                + (weighted_score * 0.2)
+            )
         return round(final_score, 3)
+
+    def score_collision(
+        self,
+        fingerprints,
+        collision_threshold_percent=0.1,
+    ):
+        _collided_fingerprints = []
+        _collision_tracker = defaultdict(lambda: defaultdict(int))
+        if not fingerprints:
+            logger.warning("No fingerprints to score")
+            return 0.0
+        for fp in fingerprints:
+            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
+            _collision_tracker[key][fp["fingerprint"]] += 1
+        _sorted_collision_tracker = {
+            k: dict(sorted(v.items(), key=lambda item: item[1], reverse=True))
+            for k, v in _collision_tracker.items()
+        }
+        _collided_fingerprints_count = 0
+        for key, collisions in _sorted_collision_tracker.items():
+            if len(collisions) > 1:
+                for index, (fingerprint, count) in enumerate(collisions.items()):
+                    if index >= 1:
+                        _collided_fingerprints_count += count
+                        if fingerprint not in _collided_fingerprints:
+                            _collided_fingerprints.append(fingerprint)
+        _collision_percentile = _collided_fingerprints_count / len(fingerprints)
+        if _collision_percentile > collision_threshold_percent:
+            return 0.0, _collided_fingerprints
+        _collision_score = 0.5 - (_collision_percentile / collision_threshold_percent)
+
+        return round(_collision_score, 3), _collided_fingerprints
+
+    def score_fragmentation(
+        self,
+        fingerprints,
+        fragmented_fingerprints: list,
+        fragmentation_threshold_percent=0.1,
+    ):
+        _collision_tracker = defaultdict(lambda: defaultdict(int))
+
+        if not fingerprints:
+            logger.warning("No fingerprints to score")
+            return 0.0
+        for fp in fingerprints:
+            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
+            _collision_tracker[fp["fingerprint"]][key] += 1
+        _sorted_fragmentation_tracker = {
+            k: dict(sorted(v.items(), key=lambda item: item[1], reverse=True))
+            for k, v in _collision_tracker.items()
+        }
+        _fragmented_fingerprints_count = 0
+        for key, collisions in _sorted_fragmentation_tracker.items():
+            if len(collisions) > 1:
+                for index, (_, count) in enumerate(collisions.items()):
+                    if index >= 1:
+                        _fragmented_fingerprints_count += count
+                        if fp["fingerprint"] not in fragmented_fingerprints:
+                            fragmented_fingerprints.append(fp["fingerprint"])
+        _fragmentation_percentile = _fragmented_fingerprints_count / len(fingerprints)
+
+        if _fragmentation_percentile > fragmentation_threshold_percent:
+            return 0.0, fragmented_fingerprints
+        _fragmentation_score = 0.5 - (
+            _fragmentation_percentile / fragmentation_threshold_percent
+        )
+
+        return round(_fragmentation_score, 3), fragmented_fingerprints
+
+    def score_testcase_n_browser(
+        self,
+        fingerprints,
+        testcase_weights: dict,
+        browser_weights: dict,
+        invalid_fingerprints,
+    ):
+        _total_weight = 0
+        valid_weights = 0
+        if not fingerprints:
+            logger.warning("No fingerprints to score")
+            return 0.0
+        for fp in fingerprints:
+            testcase = fp["testcase"]
+            browser = fp["browser"]
+            _current_weight = testcase_weights.get(testcase, 1) + browser_weights.get(
+                browser, 1
+            )
+            if fp["fingerprint"] in invalid_fingerprints:
+                _total_weight += _current_weight
+                continue
+            valid_weights += _current_weight
+            _total_weight += _current_weight
+
+        if _total_weight == 0:
+            return 0.0
+        return valid_weights / _total_weight
 
 
 class ScoringStatus(str, Enum):

@@ -74,8 +74,8 @@ class ScoringConfig(BaseModel):
     )
     collision_penalty: float = Field(default=0.3, ge=0.0, le=1.0)
     fragmentation_penalty: float = Field(default=0.2, ge=0.0, le=1.0)
-    max_collision_threshold: int = Field(default=2, ge=1)
-    max_fragmentation_threshold: int = Field(default=3, ge=1)
+    max_collision_threshold: float = Field(default=0.1, ge=0.0, le=1.0)
+    max_fragmentation_threshold: float = Field(default=0.1, ge=0.0, le=1.0)
 
 
 class ChallengeConfig(BaseConfig):
