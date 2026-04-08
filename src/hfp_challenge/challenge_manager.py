@@ -113,7 +113,7 @@ class HFPChallengeManager(ChallengeManager):
 
             self._unique_scored_docker_hub_ids.add(miner_commit.docker_hub_id)
 
-            return
+        return
 
     def get_challenge_scores(self) -> np.ndarray:
         """Calculate final scores for all miners matching the original implementation."""

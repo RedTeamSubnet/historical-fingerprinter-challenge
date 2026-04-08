@@ -136,12 +136,17 @@ class HFPController(Controller):
                 if _scoring_log.miner_output is not None
                 else 0.0
             )
+            telemetry = self._get_telemetry_from_challenge()
+            _scoring_log.miner_output["telemetry"] = telemetry
+
             _scoring_log.score = score
         return
 
     def _exclude_output_keys(self, miner_output: dict, reference_output: dict) -> None:
         miner_output["commit_files"] = None
         reference_output["commit_files"] = None
+        miner_output["telemetry"] = None
+        reference_output["telemetry"] = None
 
     def _get_results_from_challenge(self) -> dict:
         result_url = "http://localhost:10001/results"
@@ -152,6 +157,18 @@ class HFPController(Controller):
         except Exception as exc:
             bt.logging.error(
                 f"[CONTROLLER] Unable to fetch result from challenge endpoint: {exc}"
+            )
+            return {}
+
+    def _get_telemetry_from_challenge(self) -> dict:
+        telemetry_url = "http://localhost:10001/telemetry"
+        try:
+            response = requests.get(telemetry_url, timeout=5, verify=False)  # nosec
+            response.raise_for_status()
+            return response.json() if response.content else {}
+        except Exception as exc:
+            bt.logging.error(
+                f"[CONTROLLER] Unable to fetch telemetry from challenge endpoint: {exc}"
             )
             return {}
 
