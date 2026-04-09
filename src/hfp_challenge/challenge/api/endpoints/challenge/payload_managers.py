@@ -172,11 +172,11 @@ class PayloadManager:
         _fragmented_fingerprints_count = 0
         for key, collisions in _sorted_fragmentation_tracker.items():
             if len(collisions) > 1:
-                for index, (_, count) in enumerate(collisions.items()):
+                for index, (_fingerprint, count) in enumerate(collisions.items()):
                     if index >= 1:
                         _fragmented_fingerprints_count += count
-                        if fp["fingerprint"] not in fragmented_fingerprints:
-                            fragmented_fingerprints.append(fp["fingerprint"])
+                        if _fingerprint not in fragmented_fingerprints:
+                            fragmented_fingerprints.append(_fingerprint)
         _fragmentation_percentile = _fragmented_fingerprints_count / len(fingerprints)
 
         if _fragmentation_percentile > fragmentation_threshold_percent:
