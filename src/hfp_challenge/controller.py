@@ -6,7 +6,11 @@ import requests
 
 import bittensor as bt
 
-from redteam_core.validator.models import MinerChallengeCommit, ScoringLog
+from redteam_core.validator.models import (
+    MinerChallengeCommit,
+    ScoringLog,
+    ComparisonLog,
+)
 from redteam_core.challenge_pool.controller import Controller
 from redteam_core.challenge_pool import docker_utils
 from redteam_core.config.main import constants
@@ -55,9 +59,23 @@ class HFPController(Controller):
             try:
                 self._setup_miner_container(miner_commit)
                 self._generate_scoring_logs(miner_commit, challenge_inputs)
-                self._run_reference_comparison_inputs(miner_commit)
+                _max_comparison_score = self._check_comparison_score(miner_commit)
+                if _max_comparison_score > 0.8:
+                    bt.logging.info(
+                        f"[CONTROLLER] Max comparison score {_max_comparison_score} > 0.8, skipping comparison validation."
+                    )
+                    miner_commit.comparison_logs = {
+                        "skipped": [
+                            ComparisonLog(
+                                similarity_score=_max_comparison_score,
+                                reason="high similarity detected",
+                            )
+                        ]
+                    }
+                else:
+                    self._run_reference_comparison_inputs(miner_commit)
                 self._score_miner_with_new_inputs(miner_commit, challenge_inputs)
-
+                self.same_score_comparison(miner_commit)
                 result_payload = self._get_results_from_challenge()
                 if result_payload:
                     self._save_result_to_data_folder(
