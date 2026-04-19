@@ -23,6 +23,7 @@ class HFPController(Controller):
         challenge_info: dict,
         miner_commits: list[MinerChallengeCommit],
         reference_comparison_commits: list[MinerChallengeCommit],
+        miners_docker_info: dict[str, dict],
         seed_inputs: list[dict] = [],
     ):
         super().__init__(
@@ -30,6 +31,7 @@ class HFPController(Controller):
             challenge_info,
             miner_commits,
             reference_comparison_commits,
+            miners_docker_info,
             seed_inputs,
         )
         comparison_config = self.challenge_info.get("comparison_config", {})
@@ -105,7 +107,7 @@ class HFPController(Controller):
             docker_utils.clean_docker_resources(
                 client=self.docker_client,
                 remove_containers=True,
-                remove_images=False,
+                remove_images=True,
             )
         bt.logging.debug(
             "[CONTROLLER] Challenge completed, cleaning up challenge container"
