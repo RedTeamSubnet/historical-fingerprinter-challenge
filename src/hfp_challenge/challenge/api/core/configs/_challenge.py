@@ -94,11 +94,6 @@ class ChallengeConfig(BaseConfig):
     )
     submission_length_limit: int = Field(default=1000, ge=1)
     framework_images: list[FrameworkImageConfig] = Field(default_factory=list)
-    repeated_framework_count: int = Field(default=3, ge=1)
-    human_injection_count: int = Field(default=1, ge=0)
-    allowed_webdriver_miss_count: int = Field(default=2, ge=0)
-    allowed_websocket_miss_count: int = Field(default=2, ge=0)
-    allowed_human_miss_count: int = Field(default=1, ge=0)
     fp_container: FingerpinterContainerConfig = Field(
         default_factory=FingerpinterContainerConfig
     )
