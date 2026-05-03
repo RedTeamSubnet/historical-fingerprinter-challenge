@@ -110,7 +110,14 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 f"[{request_id}] - Fingerprinting completed. Stored {payload_manager.fingerprint_count()} fingerprints"
             )
 
-            final_score = payload_manager.calculate_score()
+            if _request_miss_counter > config.challenge.acceptable_miss_count:
+                logger.warning(
+                    f"[{request_id}] - Missed {_request_miss_counter} requests, which exceeds the acceptable threshold"
+                )
+                final_score = 0.0
+            else:
+                final_score = payload_manager.calculate_score()
+
             logger.success(f"[{request_id}] - Final Score: {final_score:.3f}")
 
         finally:
