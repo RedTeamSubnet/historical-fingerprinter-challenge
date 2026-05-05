@@ -3,7 +3,6 @@ from api.config import config
 from enum import Enum
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass

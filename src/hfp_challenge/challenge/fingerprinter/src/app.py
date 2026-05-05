@@ -1,6 +1,9 @@
 import sys
 import logging
+import hashlib
+import json
 from contextlib import asynccontextmanager
+from typing import Any
 from uuid import uuid4
 
 from fastapi import FastAPI, Body, HTTPException, Request
@@ -29,6 +32,24 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+def _generate_server_fingerprint(payload: dict[str, Any]) -> str:
+    normalized: dict[str, str] = {}
+    for key, value in payload.items():
+        if value is None:
+            normalized[key] = ""
+        elif isinstance(value, bool):
+            normalized[key] = "1" if value else "0"
+        elif isinstance(value, (int, float)):
+            normalized[key] = str(value)
+        else:
+            normalized[key] = str(value).lower().strip()
+
+    sorted_json = json.dumps(normalized, sort_keys=True)
+    fingerprint = hashlib.sha256(sorted_json.encode()).hexdigest()
+    logger.info("Generated server fingerprint: %s...", fingerprint[:16])
+    return fingerprint
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -47,7 +68,8 @@ def fingerprint(
         _request_id: str = request.headers.get("X-Correlation-ID", _request_id)
     try:
         payload = preprocess_metrics(fingerprint_input.products)
-        result = generate_and_link(payload, app.state.db)
+        fingerprint_hash = _generate_server_fingerprint(payload)
+        result = generate_and_link(fingerprint_hash, payload, app.state.db)
 
         return FingerprintOutput(
             fingerprint=result["fingerprint"],

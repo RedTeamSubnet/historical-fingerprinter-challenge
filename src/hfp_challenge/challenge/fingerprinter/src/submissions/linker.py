@@ -1,5 +1,3 @@
-import hashlib
-import json
 import logging
 import sqlite3
 from typing import Any
@@ -7,30 +5,9 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 
-def generate_fingerprint(payload: dict[str, Any]) -> str:
-    normalized = {}
-    for key, value in payload.items():
-        if value is None:
-            normalized[key] = ""
-        elif isinstance(value, bool):
-            normalized[key] = "1" if value else "0"
-        elif isinstance(value, (int, float)):
-            normalized[key] = str(value)
-        else:
-            normalized[key] = str(value).lower().strip()
-
-    sorted_json = json.dumps(normalized, sort_keys=True)
-    fingerprint = hashlib.sha256(sorted_json.encode()).hexdigest()
-
-    logger.info(f"Generated fingerprint: {fingerprint[:16]}...")
-    return fingerprint
-
-
 def generate_and_link(
-    payload: dict[str, Any], db_conn: sqlite3.Connection
+    fingerprint: str, payload: dict[str, Any], db_conn: sqlite3.Connection
 ) -> dict[str, Any]:
-    fingerprint = generate_fingerprint(payload)
-
     cursor = db_conn.cursor()
 
     cursor.execute(
@@ -154,4 +131,4 @@ def generate_and_link(
         return {"fingerprint": fingerprint, "is_new": True, "id": cursor.lastrowid}
 
 
-__all__ = ["generate_fingerprint", "generate_and_link"]
+__all__ = ["generate_and_link"]
