@@ -1,13 +1,16 @@
 import logging
 import sqlite3
 from typing import Any
+from .hashing import hash_payload
 
 logger = logging.getLogger(__name__)
 
 
 def generate_and_link(
-    fingerprint: str, payload: dict[str, Any], db_conn: sqlite3.Connection
+    payload: dict[str, Any], db_conn: sqlite3.Connection
 ) -> dict[str, Any]:
+    fingerprint = hash_payload(payload)
+
     cursor = db_conn.cursor()
 
     cursor.execute(
