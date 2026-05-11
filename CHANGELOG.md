@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.0.0 (2026-05-11)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### ✨ Features
+* Historical Fingerprinter V2 by @aliyuldashev in https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/pull/8
+
+
+**Full Changelog**: https://github.com/RedTeamSubnet/historical-fingerprinter-challenge/compare/v1.1.8...v2.0.0
+
 ## v1.1.8 (2026-05-03)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
