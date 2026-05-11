@@ -63,7 +63,6 @@ def preprocess_metrics(raw_metrics: dict[str, Any]) -> dict[str, Any]:
 
     # Filter out empty values
     payload = {k: v for k, v in payload.items() if v is not None and v != ""}
-    logger.info(f"Preprocessed metrics: {list(payload.keys())}")
     return payload
 
 

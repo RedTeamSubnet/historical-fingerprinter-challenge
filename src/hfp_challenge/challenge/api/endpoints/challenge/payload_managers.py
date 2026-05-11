@@ -3,7 +3,6 @@ from api.config import config
 from enum import Enum
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -57,22 +56,33 @@ class PayloadManager:
         self.fingerprints = []
 
     def store_fingerprint(
-        self, social_id: str, fingerprint: str, payload: dict, request_id: str = None
+        self,
+        social_id: str,
+        fingerprint: str,
+        payload: dict,
+        request_id: str = None,
+        unique_device: str | None = None,
+        test_case: str | None = None,
+        browser: str | None = None,
+        username: str | None = None,
+        device_model: str | None = None,
     ) -> None:
-        parts = social_id.lower().split("_")
-        if len(parts) != 4:
-            logger.warning(f"Invalid social_id format: {social_id}")
-            return
+        normalized_unique_device = (unique_device or "").strip().lower()
+        normalized_test_case = (test_case or "").strip().lower()
+        normalized_browser = (browser or "").strip().lower()
 
-        testcase, sendername, device, browser = parts
+        if not normalized_unique_device:
+            logger.warning(f"Missing unique_device for social_id: {social_id}")
+            return
 
         self.fingerprints.append(
             {
                 "social_id": social_id,
-                "testcase": testcase,
-                "sendername": sendername,
-                "device": device,
-                "browser": browser,
+                "testcase": normalized_test_case,
+                "sendername": (username or "").strip().lower(),
+                "device": (device_model or "").strip().lower(),
+                "browser": normalized_browser,
+                "unique_device": normalized_unique_device,
                 "fingerprint": fingerprint,
                 "payload": payload,
                 "request_id": request_id,
@@ -103,7 +113,6 @@ class PayloadManager:
         weighted_score = self.score_testcase_n_browser(
             self.fingerprints,
             scoring_cfg.testcase_weights,
-            scoring_cfg.browser_weights,
             collided_fps,
         )
         logger.info(
@@ -130,7 +139,7 @@ class PayloadManager:
             logger.warning("No fingerprints to score")
             return 0.0
         for fp in fingerprints:
-            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
+            key = fp["unique_device"]
             _collision_tracker[key][fp["fingerprint"]] += 1
         _sorted_collision_tracker = {
             k: dict(sorted(v.items(), key=lambda item: item[1], reverse=True))
@@ -163,7 +172,7 @@ class PayloadManager:
             logger.warning("No fingerprints to score")
             return 0.0
         for fp in fingerprints:
-            key = f"{fp['sendername']}_{fp['device']}_{fp['browser']}"
+            key = fp["unique_device"]
             _collision_tracker[fp["fingerprint"]][key] += 1
         _sorted_fragmentation_tracker = {
             k: dict(sorted(v.items(), key=lambda item: item[1], reverse=True))
@@ -191,7 +200,6 @@ class PayloadManager:
         self,
         fingerprints,
         testcase_weights: dict,
-        browser_weights: dict,
         invalid_fingerprints,
     ):
         _total_weight = 0
@@ -201,10 +209,7 @@ class PayloadManager:
             return 0.0
         for fp in fingerprints:
             testcase = fp["testcase"]
-            browser = fp["browser"]
-            _current_weight = testcase_weights.get(testcase, 1) + browser_weights.get(
-                browser, 1
-            )
+            _current_weight = testcase_weights.get(testcase, 1)
             if fp["fingerprint"] in invalid_fingerprints:
                 _total_weight += _current_weight
                 continue

@@ -70,9 +70,24 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
             base_url = f"http://{ip_address}:{config.challenge.fingerprinter_port}"
             df = pd.read_csv(config.challenge.metrics_csv_path)
             runtime_start = time.perf_counter()
-            for index, row in df[["social_id", "user_metrics"]].iterrows():
+            for index, row in df[
+                [
+                    "social_id",
+                    "user_metrics",
+                    "browser",
+                    "device_model",
+                    "username",
+                    "test_case",
+                    "unique_device",
+                ]
+            ].iterrows():
                 social_id = str(row["social_id"])
                 user_metrics = json.loads(str(row["user_metrics"]))
+                browser = str(row["browser"])
+                device_model = str(row["device_model"])
+                username = str(row["username"])
+                test_case = str(row["test_case"])
+                unique_device = str(row["unique_device"])
                 try:
                     resp = requests.post(
                         f"{base_url}/fingerprint",
@@ -88,6 +103,11 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                             fingerprint,
                             payload,
                             resp.json().get("request_id"),
+                            unique_device=unique_device,
+                            test_case=test_case,
+                            browser=browser,
+                            username=username,
+                            device_model=device_model,
                         )
                     else:
                         _request_miss_counter += 1

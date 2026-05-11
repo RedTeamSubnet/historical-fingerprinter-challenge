@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -117,7 +117,7 @@ class MinerOutput(BaseModel):
 
 
 class ScoringTelemetryResponse(BaseModel):
-    request_id: Optional[str] = Field(
+    request_id: str | None = Field(
         default=None,
         title="Request ID",
         description="The request ID for this scoring run.",
@@ -146,7 +146,7 @@ class ScoringTelemetryResponse(BaseModel):
         description="Total network bytes transmitted during scoring.",
         ge=0,
     )
-    score: Optional[float] = Field(
+    score: float | None = Field(
         default=None,
         title="Score",
         description="The computed score for this scoring run.",

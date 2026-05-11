@@ -17,8 +17,8 @@ This is a miner commit API example for Historical Fingerprinter Challenge.
 
 - Install **Python (>= v3.10)** and **pip (>= 23)**:
     - **[RECOMMENDED] [Miniconda (v3)](https://www.anaconda.com/docs/getting-started/miniconda/install)**
-    - *[arm64/aarch64] [Miniforge (v3)](https://github.com/conda-forge/miniforge)*
-    - *[Python virtual environment] [venv](https://docs.python.org/3/library/venv.html)*
+    - _[arm64/aarch64] [Miniforge (v3)](https://github.com/conda-forge/miniforge)_
+    - _[Python virtual environment] [venv](https://docs.python.org/3/library/venv.html)_
 
 [OPTIONAL] For **DEVELOPMENT** environment:
 
@@ -31,7 +31,20 @@ This is a miner commit API example for Historical Fingerprinter Challenge.
 pip install -r ./requirements.txt
 ```
 
-### 3. 🏁 Start the server
+### 3. ✅ Validate formatting before submission
+
+Before finishing development, miners must run Ruff format checks for each file in `src/commit/`.
+
+```sh
+ruff format --config ../../volumes/configs/.ruff.toml --check ./src/commit/initializer.py
+ruff format --config ../../volumes/configs/.ruff.toml --check ./src/commit/linker.py
+ruff format --config ../../volumes/configs/.ruff.toml --check ./src/commit/metrics_collector.py
+```
+
+> [!CAUTION]
+> Do not use any bypass techniques to avoid linting or formatting checks.
+
+### 4. 🏁 Start the server
 
 ```sh
 cd src
@@ -41,7 +54,7 @@ uvicorn app:app --host="0.0.0.0" --port=10002 --no-access-log --no-server-header
 uvicorn app:app --host="0.0.0.0" --port=10002 --no-access-log --no-server-header --proxy-headers --forwarded-allow-ips="*" --reload
 ```
 
-### 4. ✅ Check server is running
+### 5. ✅ Check server is running
 
 Check with CLI (curl):
 

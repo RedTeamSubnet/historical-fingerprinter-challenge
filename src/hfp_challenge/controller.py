@@ -63,9 +63,9 @@ class HFPController(Controller):
                 self._generate_scoring_logs(miner_commit, challenge_inputs)
                 _max_comparison_score = self._check_comparison_score(miner_commit)
                 if _max_comparison_score >= self.comparison_min_acceptable_score:
-                    bt.logging.info(
-                        f"[CONTROLLER] Max comparison score {_max_comparison_score} >= {self.comparison_min_acceptable_score}, skipping comparison validation."
-                    )
+                    bt.logging.info(f"[CONTROLLER] Max comparison score \
+                            {_max_comparison_score} >= {self.comparison_min_acceptable_score}, \
+                                skipping comparison validation.")
                     miner_commit.comparison_logs = {
                         "skipped": [
                             ComparisonLog(

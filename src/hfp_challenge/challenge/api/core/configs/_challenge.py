@@ -50,25 +50,22 @@ class FingerpinterContainerConfig(BaseModel):
 class ScoringConfig(BaseModel):
     testcase_weights: dict[str, float] = Field(
         default_factory=lambda: {
-            "vpnstealth": 10.0,
-            "audiohardwareshift": 8.0,
-            "deepmobilespoof": 7.0,
-            "incognito": 6.0,
-            "webgpuliar": 6.0,
-            "canvasspoofer": 5.0,
-            "fontsshielded": 5.0,
-            "dirtydom": 5.0,
-            "mediagranted": 5.0,
-            "crossbrowser": 3.0,
+            "anti_fingerprint_browser": 10.0,
+            "timezone_change": 8.0,
+            "language_change": 8.0,
+            "vpn_proxy_enabled": 5.0,
+            "incognito_with_vpn": 7.0,
+            "incognito_mode": 3.0,
+            "normal": 1.0,
         }
     )
     browser_weights: dict[str, float] = Field(
         default_factory=lambda: {
-            "tor": 4.0,
+            "brave": 4.0,
             "firefox": 3.0,
-            "yandex": 3.0,
-            "brave": 2.0,
-            "safari": 2.0,
+            "safari": 3.0,
+            "duckduckgo": 2.0,
+            "edge": 2.0,
             "chrome": 1.0,
         }
     )

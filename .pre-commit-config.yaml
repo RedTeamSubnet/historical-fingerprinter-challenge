@@ -22,6 +22,8 @@ exclude: |
     | dataset/.*
     | datasets/.*
     | tmp/.*
+    | .*\.csv$
+
   )$
 
 repos:
