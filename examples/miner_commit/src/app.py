@@ -31,10 +31,19 @@ def solve(miner_input: MinerInput = Body(...)) -> MinerOutput:
     try:
         _src_dir = pathlib.Path(__file__).parent.resolve()
         _commit_dir = _src_dir / "commit"
-        _commit_paths: list[Path] = list(_commit_dir.glob("*.py"))
+        _submission_files = [
+            "metrics_collector.py",
+            "initializer.py",
+            "linker.py",
+        ]
+        _commit_paths: list[Path] = [
+            _commit_dir / _file_name for _file_name in _submission_files
+        ]
 
         _commit_files: list[CommitFilePM] = []
         for _commit_path in _commit_paths:
+            if not _commit_path.exists():
+                raise FileNotFoundError(f"Missing submission file: {_commit_path.name}")
             with open(_commit_path) as _commit_file:
                 _commit_file_pm = CommitFilePM(
                     file_name=_commit_path.name, content=_commit_file.read()

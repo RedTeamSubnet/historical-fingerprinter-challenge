@@ -34,7 +34,12 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
     container = None
 
     scoring_status_manager.set_scoring_status(ScoringStatus.SCORING)
-    final_score = 0.0
+    final_score, collision_score, fragmentation_score, weighted_score = (
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
 
     total_file_size = 0
 
@@ -136,7 +141,9 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 )
                 final_score = 0.0
             else:
-                final_score = payload_manager.calculate_score()
+                final_score, collision_score, fragmentation_score, weighted_score = (
+                    payload_manager.calculate_score()
+                )
 
             logger.success(f"[{request_id}] - Final Score: {final_score:.3f}")
 
@@ -153,6 +160,9 @@ def score(request_id: str, miner_output: MinerOutput) -> None:
                 network_rx_bytes=network_stats.network_rx_bytes,
                 network_tx_bytes=network_stats.network_tx_bytes,
                 score=final_score,
+            )
+            payload_manager.store_scores_breakdown(
+                collision_score, fragmentation_score, weighted_score
             )
 
             if container:

@@ -41,7 +41,11 @@ def get_results(request: Request):
     logger.info(f"[{_request_id}] - Getting results...")
 
     results = payload_manager.get_fingerprints()
-    return results
+    score_breakdown = payload_manager.get_scores_breakdown()
+    return {
+        "fingerprints": results,
+        "results": score_breakdown,
+    }
 
 
 @router.get(

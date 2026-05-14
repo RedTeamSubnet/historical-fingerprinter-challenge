@@ -78,15 +78,6 @@ class HFPController(Controller):
                     self._run_reference_comparison_inputs(miner_commit)
                 self._score_miner_with_new_inputs(miner_commit, challenge_inputs)
                 self.same_score_comparison(miner_commit)
-                result_payload = self._get_results_from_challenge()
-                if result_payload:
-                    self._save_result_to_data_folder(
-                        result_payload, miner_commit.docker_hub_id
-                    )
-                else:
-                    bt.logging.warning(
-                        f"[CONTROLLER] No result payload received for miner {uid} - {hotkey}"
-                    )
 
             except Exception as e:
                 bt.logging.error(f"Error while processing miner {uid} - {hotkey}: {e}")
@@ -158,6 +149,18 @@ class HFPController(Controller):
             )
             telemetry = self._get_telemetry_from_challenge()
             _scoring_log.miner_output["telemetry"] = telemetry
+            result_payload = self._get_results_from_challenge()
+            if result_payload:
+                _scoring_log.miner_output["scoring_results"] = result_payload.get(
+                    "results", {}
+                )
+                self._save_result_to_data_folder(
+                    result_payload, miner_commit.docker_hub_id
+                )
+
+            else:
+                bt.logging.warning(f"[CONTROLLER] No result payload received for miner \
+                        {miner_commit.miner_hotkey} on task {i}, skipping result save")
 
             _scoring_log.score = score
         return

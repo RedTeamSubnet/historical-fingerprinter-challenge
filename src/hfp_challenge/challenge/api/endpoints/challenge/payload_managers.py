@@ -51,9 +51,23 @@ class ScoringTelemetryManager:
 class PayloadManager:
     def __init__(self):
         self.fingerprints: list[dict] = []
+        self._scores_breakdown: dict[str, float] = {}
 
     def restart_manager(self) -> None:
         self.fingerprints = []
+        self._scores_breakdown = {}
+
+    def store_scores_breakdown(
+        self, collision_score: float, fragmentation_score: float, weighted_score: float
+    ):
+        self._scores_breakdown = {
+            "collision_score": collision_score,
+            "fragmentation_score": fragmentation_score,
+            "weighted_score": weighted_score,
+        }
+
+    def get_scores_breakdown(self) -> dict[str, float]:
+        return self._scores_breakdown
 
     def store_fingerprint(
         self,
@@ -95,10 +109,10 @@ class PayloadManager:
     def fingerprint_count(self) -> int:
         return len(self.fingerprints)
 
-    def calculate_score(self) -> float:
+    def calculate_score(self) -> tuple[float, float, float, float]:
         if not self.fingerprints:
             logger.warning("No fingerprints to score")
-            return 0.0
+            return 0.0, 0.0, 0.0, 0.0
 
         scoring_cfg = config.challenge.scoring
 
@@ -126,7 +140,7 @@ class PayloadManager:
                 + (fragmentation_score * 0.4)
                 + (weighted_score * 0.2)
             )
-        return round(final_score, 3)
+        return final_score, collision_score, fragmentation_score, weighted_score
 
     def score_collision(
         self,
