@@ -42,7 +42,7 @@ class MinerOutput(BaseModel):
     def _check_commit_files(cls, val: list[CommitFilePM]) -> list[CommitFilePM]:
         for _miner_file_pm in val:
             _content_lines = _miner_file_pm.content.splitlines()
-            if len(_content_lines) > 500:
+            if len(_content_lines) > 1000:
                 raise ValueError(
                     f"`{_miner_file_pm.file_name}` file contains too many lines, should be <= 500 lines!"
                 )
